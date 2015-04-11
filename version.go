@@ -1,3 +1,4 @@
 package main
 
-const Version string = "0.1.0"
+// `make build` sets this automaticaly
+var Version string
