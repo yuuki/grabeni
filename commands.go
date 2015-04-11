@@ -5,11 +5,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/awslabs/aws-sdk-go/aws"
-	"github.com/awslabs/aws-sdk-go/service/ec2"
 	"github.com/codegangsta/cli"
 
-	myaws "github.com/y-uuki/grabeni/aws"
+	"github.com/y-uuki/grabeni/aws"
 )
 
 var Commands = []cli.Command{
@@ -78,31 +76,15 @@ func doStatus(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	region, err := myaws.GetRegion()
+	eni, err := aws.DescribeENIByID(eniID)
 	if err != nil {
 		assert(err)
 		os.Exit(1)
 	}
-
-	svc := ec2.New(&aws.Config{Region: region})
-
-	params := &ec2.DescribeNetworkInterfacesInput{
-		NetworkInterfaceIDs: []*string{
-			aws.String(eniID),
-		},
-	}
-	resp, err := svc.DescribeNetworkInterfaces(params)
-	if awserr := aws.Error(err); awserr != nil {
-		// A service error occurred.
-		fmt.Println("Error:", awserr.Code, awserr.Message)
-		os.Exit(1)
-	} else if err != nil {
-		// A non-service error occurred.
-		assert(err)
+	if eni == nil {
 		os.Exit(1)
 	}
 
-	eni := resp.NetworkInterfaces[0]
 	name := ""
 	if len(eni.TagSet) > 0 {
 		for _, tag := range eni.TagSet {
