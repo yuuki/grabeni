@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/awslabs/aws-sdk-go/aws"
-	"github.com/awslabs/aws-sdk-go/aws/awsutil"
 	"github.com/awslabs/aws-sdk-go/service/ec2"
 	"github.com/codegangsta/cli"
 
@@ -103,7 +102,27 @@ func doStatus(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	fmt.Println(awsutil.StringValue(resp))
+	eni := resp.NetworkInterfaces[0]
+	name := ""
+	if len(eni.TagSet) > 0 {
+		for _, tag := range eni.TagSet {
+			if *tag.Key == "Name" {
+				name = *tag.Value
+				break
+			}
+		}
+	}
+
+	fmt.Println("Name\tNetworkInterfaceID\tPrivateDNSName\tPrivateIPAddress\tInstanceID\tDeviceIndex\tStatus")
+	fmt.Printf("%s\t%s\t%s\t%s\t%s\t%d\t%s\t\n",
+		name,
+		*eni.NetworkInterfaceID,
+		*eni.PrivateDNSName,
+		*eni.PrivateIPAddress,
+		*eni.Attachment.InstanceID,
+		*eni.Attachment.DeviceIndex,
+		*eni.Status,
+	)
 }
 
 func doGrab(c *cli.Context) {
