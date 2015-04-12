@@ -55,6 +55,10 @@ var commandDetach = cli.Command{
 	Description: `
 `,
 	Action: doDetach,
+	Flags: []cli.Flag{
+		cli.BoolFlag{Name: "n, nametag", Usage: "ENI Tag Name"},
+		cli.StringFlag{Name: "i, instanceid", Usage: "Instance Id"},
+	},
 }
 
 func debug(v ...interface{}) {
@@ -155,4 +159,32 @@ func doAttach(c *cli.Context) {
 }
 
 func doDetach(c *cli.Context) {
+	if len(c.Args()) < 1 {
+		cli.ShowCommandHelp(c, "detach")
+		os.Exit(1)
+	}
+
+	eniID := c.Args()[0]
+	if eniID == "" {
+		cli.ShowCommandHelp(c, "detach")
+		os.Exit(1)
+	}
+
+	instanceID := c.String("instanceid")
+	if instanceID == "" {
+		cli.ShowCommandHelp(c, "detach")
+		os.Exit(1)
+	}
+
+	cli, err := aws.NewClient(c)
+	if err != nil {
+		assert(err)
+		os.Exit(1)
+	}
+
+	err = cli.DetachENI(eniID, instanceID)
+	if err != nil {
+		assert(err)
+		os.Exit(1)
+	}
 }

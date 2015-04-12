@@ -71,3 +71,26 @@ func (cli *Client) AttachENI(eniID string, instanceID string, deviceIndex int) e
 
 	return nil
 }
+
+func (cli *Client) DetachENI(eniID string, instanceID string) error {
+	eni, err := cli.DescribeENIByID(eniID)
+	if err != nil {
+		return err
+	}
+
+	params := &ec2.DetachNetworkInterfaceInput{
+		AttachmentID: eni.Attachment.AttachmentID,
+		Force:        aws.Boolean(true),
+	}
+	_, err = cli.EC2.DetachNetworkInterface(params)
+
+	if awserr := aws.Error(err); awserr != nil {
+		// A service error occurred.
+		return errors.New(awserr.Error())
+	} else if err != nil {
+		// A non-service error occurred.
+		return err
+	}
+
+	return nil
+}

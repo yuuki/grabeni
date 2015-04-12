@@ -1,4 +1,5 @@
 package aws
+
 // https://github.com/pdalinis/aws-sdk-go/blob/153_Metadata/aws/metaData.go
 
 import (
