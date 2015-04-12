@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/codegangsta/cli"
 
 	"github.com/y-uuki/grabeni/aws"
+	. "github.com/y-uuki/grabeni/log"
 )
 
 var Commands = []cli.Command{
@@ -60,18 +60,6 @@ var commandDetach = cli.Command{
 	},
 }
 
-func debug(v ...interface{}) {
-	if os.Getenv("DEBUG") != "" {
-		log.Println(v...)
-	}
-}
-
-func assert(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func fetchInstanceIDIfEmpty(c *cli.Context) string {
 	if instanceID := c.String("instanceid"); instanceID != "" {
 		return c.String(instanceID)
@@ -79,9 +67,8 @@ func fetchInstanceIDIfEmpty(c *cli.Context) string {
 
 	instanceID, err := aws.GetInstanceID()
 	if err != nil {
-		assert(err)
 		cli.ShowCommandHelp(c, c.Command.Name)
-		os.Exit(1)
+		DieIf(err)
 	}
 
 	return instanceID
@@ -100,18 +87,12 @@ func doStatus(c *cli.Context) {
 	}
 
 	cli, err := aws.NewClient(c)
-	if err != nil {
-		assert(err)
-		os.Exit(1)
-	}
+	DieIf(err)
 
 	eni, err := cli.DescribeENIByID(eniID)
-	if err != nil {
-		assert(err)
-		os.Exit(1)
-	}
+	DieIf(err)
 	if eni == nil {
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	name := ""
@@ -152,16 +133,10 @@ func doGrab(c *cli.Context) {
 	deviceIndex := c.Int("deviceindex")
 
 	cli, err := aws.NewClient(c)
-	if err != nil {
-		assert(err)
-		os.Exit(1)
-	}
+	DieIf(err)
 
 	err = cli.GrabENI(eniID, instanceID, deviceIndex)
-	if err != nil {
-		assert(err)
-		os.Exit(1)
-	}
+	DieIf(err)
 }
 
 func doAttach(c *cli.Context) {
@@ -180,16 +155,10 @@ func doAttach(c *cli.Context) {
 	deviceIndex := c.Int("deviceindex")
 
 	cli, err := aws.NewClient(c)
-	if err != nil {
-		assert(err)
-		os.Exit(1)
-	}
+	DieIf(err)
 
 	err = cli.AttachENI(eniID, instanceID, deviceIndex)
-	if err != nil {
-		assert(err)
-		os.Exit(1)
-	}
+	DieIf(err)
 }
 
 func doDetach(c *cli.Context) {
@@ -207,14 +176,8 @@ func doDetach(c *cli.Context) {
 	instanceID := fetchInstanceIDIfEmpty(c)
 
 	cli, err := aws.NewClient(c)
-	if err != nil {
-		assert(err)
-		os.Exit(1)
-	}
+	DieIf(err)
 
 	err = cli.DetachENI(eniID, instanceID)
-	if err != nil {
-		assert(err)
-		os.Exit(1)
-	}
+	DieIf(err)
 }
