@@ -42,6 +42,11 @@ var commandAttach = cli.Command{
 	Description: `
 `,
 	Action: doAttach,
+	Flags: []cli.Flag{
+		cli.BoolFlag{Name: "n, nametag", Usage: "ENI Tag Name"},
+		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "Device Index Number"},
+		cli.StringFlag{Name: "i, instanceid", Usage: "Instance Id"},
+	},
 }
 
 var commandDetach = cli.Command{
@@ -117,6 +122,36 @@ func doGrab(c *cli.Context) {
 }
 
 func doAttach(c *cli.Context) {
+	if len(c.Args()) < 1 {
+		cli.ShowCommandHelp(c, "attach")
+		os.Exit(1)
+	}
+
+	eniID := c.Args()[0]
+	if eniID == "" {
+		cli.ShowCommandHelp(c, "attach")
+		os.Exit(1)
+	}
+
+	instanceID := c.String("instanceid")
+	if instanceID == "" {
+		cli.ShowCommandHelp(c, "attach")
+		os.Exit(1)
+	}
+
+	deviceIndex := c.Int("deviceindex")
+
+	cli, err := aws.NewClient(c)
+	if err != nil {
+		assert(err)
+		os.Exit(1)
+	}
+
+	err = cli.AttachENI(eniID, instanceID, deviceIndex)
+	if err != nil {
+		assert(err)
+		os.Exit(1)
+	}
 }
 
 func doDetach(c *cli.Context) {

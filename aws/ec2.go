@@ -52,3 +52,22 @@ func (cli *Client) DescribeENIByID(eniID string) (*ec2.NetworkInterface, error) 
 
 	return resp.NetworkInterfaces[0], nil
 }
+
+func (cli *Client) AttachENI(eniID string, instanceID string, deviceIndex int) error {
+	params := &ec2.AttachNetworkInterfaceInput{
+		NetworkInterfaceID: aws.String(eniID),
+		InstanceID:         aws.String(instanceID),
+		DeviceIndex:        aws.Long(int64(deviceIndex)),
+	}
+	_, err := cli.EC2.AttachNetworkInterface(params)
+
+	if awserr := aws.Error(err); awserr != nil {
+		// A service error occurred.
+		return errors.New(awserr.Error())
+	} else if err != nil {
+		// A non-service error occurred.
+		return err
+	}
+
+	return nil
+}
