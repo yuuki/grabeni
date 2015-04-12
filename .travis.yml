@@ -1,0 +1,9 @@
+sudo: false
+language: go
+go:
+- 1.4
+env: PATH=/home/travis/gopath/bin:$PATH
+install:
+- go get github.com/laher/goxc
+script:
+- make all
