@@ -23,9 +23,6 @@ var commandStatus = cli.Command{
 	Description: `
 `,
 	Action: doStatus,
-	Flags: []cli.Flag{
-		cli.BoolFlag{Name: "n, nametag", Usage: "ENI Tag Name"},
-	},
 }
 
 var commandGrab = cli.Command{
@@ -35,7 +32,6 @@ var commandGrab = cli.Command{
 `,
 	Action: doGrab,
 	Flags: []cli.Flag{
-		cli.BoolFlag{Name: "n, nametag", Usage: "ENI Tag Name"},
 		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "Device Index Number"},
 		cli.StringFlag{Name: "i, instanceid", Usage: "Instance Id"},
 	},
@@ -48,7 +44,6 @@ var commandAttach = cli.Command{
 `,
 	Action: doAttach,
 	Flags: []cli.Flag{
-		cli.BoolFlag{Name: "n, nametag", Usage: "ENI Tag Name"},
 		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "Device Index Number"},
 		cli.StringFlag{Name: "i, instanceid", Usage: "Instance Id"},
 	},
@@ -61,7 +56,6 @@ var commandDetach = cli.Command{
 `,
 	Action: doDetach,
 	Flags: []cli.Flag{
-		cli.BoolFlag{Name: "n, nametag", Usage: "ENI Tag Name"},
 		cli.StringFlag{Name: "i, instanceid", Usage: "Instance Id"},
 	},
 }

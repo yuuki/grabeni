@@ -6,10 +6,10 @@ Grab ENI tool from an other EC2 instance.
 # Usage
 
 ```
-grabeni status [-n,--nametag] <eniId>
-grabeni grab [-n,--nametag] <eniId> [-d <deviceIndex>] [-i <instanceId>] [--dryrun]
-grabeni attach [-n,--nametag] [<eniId>] [-d <deviceIndex>] [-i <instanceId>] [--dryrun]
-grabeni detach [-n,--nametag] [<eniId>] [-i <instanceId>] [--dryrun]
+grabeni status <eniId>
+grabeni grab <eniId> [-d <deviceIndex>] [-i <instanceId>] [--dryrun]
+grabeni attach [<eniId>] [-d <deviceIndex>] [-i <instanceId>] [--dryrun]
+grabeni detach [<eniId>] [-i <instanceId>] [--dryrun]
 ```
 
 # Install
