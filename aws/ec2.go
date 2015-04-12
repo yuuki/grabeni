@@ -72,17 +72,12 @@ func (cli *Client) AttachENI(eniID string, instanceID string, deviceIndex int) e
 	return nil
 }
 
-func (cli *Client) DetachENI(eniID string, instanceID string) error {
-	eni, err := cli.DescribeENIByID(eniID)
-	if err != nil {
-		return err
-	}
-
+func (cli *Client) DetachENIByAttachmentID(attachmentID string) error {
 	params := &ec2.DetachNetworkInterfaceInput{
-		AttachmentID: eni.Attachment.AttachmentID,
+		AttachmentID: aws.String(attachmentID),
 		Force:        aws.Boolean(true),
 	}
-	_, err = cli.EC2.DetachNetworkInterface(params)
+	_, err := cli.EC2.DetachNetworkInterface(params)
 
 	if awserr := aws.Error(err); awserr != nil {
 		// A service error occurred.
@@ -94,3 +89,13 @@ func (cli *Client) DetachENI(eniID string, instanceID string) error {
 
 	return nil
 }
+
+func (cli *Client) DetachENI(eniID string, instanceID string) error {
+	eni, err := cli.DescribeENIByID(eniID)
+	if err != nil {
+		return err
+	}
+
+	return cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
+}
+
