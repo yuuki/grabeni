@@ -5,7 +5,7 @@ Grab ENI tool from an other EC2 instance.
 
 # Usage
 
-```
+```shell
 grabeni status <eniId>
 grabeni grab <eniId> [-d <deviceIndex>] [-i <instanceId>] [--dryrun]
 grabeni attach [<eniId>] [-d <deviceIndex>] [-i <instanceId>] [--dryrun]

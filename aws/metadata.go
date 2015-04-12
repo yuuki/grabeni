@@ -9,33 +9,35 @@ import (
 	"time"
 )
 
+var (
+	metadataURL = "http://169.254.169.254/latest/meta-data/"
+)
+
 func GetMetaData(path string) (contents []byte, err error) {
-	url := "http://169.254.169.254/latest/meta-data/" + path
+	url := metadataURL + path
 
 	req, _ := http.NewRequest("GET", url, nil)
 	client := http.Client{
-		Timeout: time.Millisecond * 100,
+		Timeout: time.Millisecond * 500,
 	}
 
 	resp, err := client.Do(req)
-
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		err = fmt.Errorf("Code %d returned for url %s", resp.StatusCode, url)
-		return
+		return nil, err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
-
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	return []byte(body), err
+	return []byte(body), nil
 }
 
 // Gets the Region that the instance is running in.
