@@ -15,12 +15,17 @@ type Client struct {
 func NewClient(c *cli.Context) (*Client, error) {
 	config := aws.DefaultConfig
 
+	config.Region = c.GlobalString("region")
 	if config.Region == "" {
 		region, err := GetRegion()
 		if err != nil {
 			return nil, err
 		}
 		config.Region = region
+	}
+
+	if c.GlobalString("accesskey") != "" && c.GlobalString("secretkey") != "" {
+		config.Credentials = aws.Creds(c.GlobalString("accesskey"), c.GlobalString("secretkey"), "")
 	}
 
 	return &Client{ec2.New(config)}, nil
