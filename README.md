@@ -1,7 +1,14 @@
 grabeni
 =======
+[![Latest Version](http://img.shields.io/github/release/y-uuki/grabeni.svg?style=flat-square)][release]
+[![Build Status](http://img.shields.io/travis/y-uuki/grabeni.svg?style=flat-square)][travis]
+[![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
 
-Grab ENI tool from an other EC2 instance.
+[release]: https://github.com/y-uuki/grabeni/releases
+[travis]: http://travis-ci.org/y-uuki/grabeni
+[godocs]: http://godoc.org/github.com/y-uuki/grabeni
+
+grabeni - Grab ENI tool from an other EC2 instance.
 
 # Usage
 
