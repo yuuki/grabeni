@@ -76,7 +76,13 @@ func doStatus(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	eni, err := aws.DescribeENIByID(eniID)
+	cli, err := aws.NewClient(c)
+	if err != nil {
+		assert(err)
+		os.Exit(1)
+	}
+
+	eni, err := cli.DescribeENIByID(eniID)
 	if err != nil {
 		assert(err)
 		os.Exit(1)

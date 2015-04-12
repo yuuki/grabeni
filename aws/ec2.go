@@ -5,22 +5,34 @@ import (
 
 	"github.com/awslabs/aws-sdk-go/aws"
 	"github.com/awslabs/aws-sdk-go/service/ec2"
+	"github.com/codegangsta/cli"
 )
 
-func DescribeENIByID(eniID string) (*ec2.NetworkInterface, error) {
-	region, err := GetRegion()
-	if err != nil {
-		return nil, err
+type Client struct {
+	*ec2.EC2
+}
+
+func NewClient(c *cli.Context) (*Client, error) {
+	config := aws.DefaultConfig
+
+	if config.Region == "" {
+		region, err := GetRegion()
+		if err != nil {
+			return nil, err
+		}
+		config.Region = region
 	}
 
-	svc := ec2.New(&aws.Config{Region: region})
+	return &Client{ec2.New(config)}, nil
+}
 
+func (cli *Client) DescribeENIByID(eniID string) (*ec2.NetworkInterface, error) {
 	params := &ec2.DescribeNetworkInterfacesInput{
 		NetworkInterfaceIDs: []*string{
 			aws.String(eniID),
 		},
 	}
-	resp, err := svc.DescribeNetworkInterfaces(params)
+	resp, err := cli.EC2.DescribeNetworkInterfaces(params)
 	if awserr := aws.Error(err); awserr != nil {
 		// A service error occurred.
 		return nil, errors.New(awserr.Error())
