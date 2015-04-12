@@ -98,4 +98,3 @@ func (cli *Client) DetachENI(eniID string, instanceID string) error {
 
 	return cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
 }
-
