@@ -78,6 +78,21 @@ func assert(err error) {
 	}
 }
 
+func fetchInstanceIDIfEmpty(c *cli.Context) string {
+	if instanceID := c.String("instanceid"); instanceID != "" {
+		return c.String(instanceID)
+	}
+
+	instanceID, err := aws.GetInstanceID()
+	if err != nil {
+		assert(err)
+		cli.ShowCommandHelp(c, c.Command.Name)
+		os.Exit(1)
+	}
+
+	return instanceID
+}
+
 func doStatus(c *cli.Context) {
 	if len(c.Args()) < 1 {
 		cli.ShowCommandHelp(c, "status")
@@ -139,12 +154,7 @@ func doGrab(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	instanceID := c.String("instanceid")
-	if instanceID == "" {
-		cli.ShowCommandHelp(c, "grab")
-		os.Exit(1)
-	}
-
+	instanceID := fetchInstanceIDIfEmpty(c)
 	deviceIndex := c.Int("deviceindex")
 
 	cli, err := aws.NewClient(c)
@@ -172,12 +182,7 @@ func doAttach(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	instanceID := c.String("instanceid")
-	if instanceID == "" {
-		cli.ShowCommandHelp(c, "attach")
-		os.Exit(1)
-	}
-
+	instanceID := fetchInstanceIDIfEmpty(c)
 	deviceIndex := c.Int("deviceindex")
 
 	cli, err := aws.NewClient(c)
@@ -205,11 +210,7 @@ func doDetach(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	instanceID := c.String("instanceid")
-	if instanceID == "" {
-		cli.ShowCommandHelp(c, "detach")
-		os.Exit(1)
-	}
+	instanceID := fetchInstanceIDIfEmpty(c)
 
 	cli, err := aws.NewClient(c)
 	if err != nil {

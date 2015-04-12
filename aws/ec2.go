@@ -119,7 +119,7 @@ func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) err
 		}
 
 		// Sometimes detaching ENI is too slow
-		time.Sleep(5 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
 
 	err = cli.AttachENI(eniID, instanceID, deviceIndex)

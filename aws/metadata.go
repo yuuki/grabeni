@@ -41,7 +41,6 @@ func GetMetaData(path string) (contents []byte, err error) {
 // Gets the Region that the instance is running in.
 func GetRegion() (string, error) {
 	path := "placement/availability-zone"
-
 	resp, err := GetMetaData(path)
 	if err != nil {
 		return "", err
@@ -51,6 +50,16 @@ func GetRegion() (string, error) {
 
 	//returns us-west-2a, just return us-west-2
 	return string(az[:len(az)-1]), nil
+}
+
+func GetInstanceID() (string, error) {
+	path := "instance-id"
+	resp, err := GetMetaData(path)
+	if err != nil {
+		return "", err
+	}
+
+	return string(resp), nil
 }
 
 func IsInAws() bool {
