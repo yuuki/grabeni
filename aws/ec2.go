@@ -2,6 +2,7 @@ package aws
 
 import (
 	"errors"
+	"time"
 
 	"github.com/awslabs/aws-sdk-go/aws"
 	"github.com/awslabs/aws-sdk-go/service/ec2"
@@ -75,7 +76,7 @@ func (cli *Client) AttachENI(eniID string, instanceID string, deviceIndex int) e
 func (cli *Client) DetachENIByAttachmentID(attachmentID string) error {
 	params := &ec2.DetachNetworkInterfaceInput{
 		AttachmentID: aws.String(attachmentID),
-		Force:        aws.Boolean(true),
+		Force:        aws.Boolean(false),
 	}
 	_, err := cli.EC2.DetachNetworkInterface(params)
 
@@ -97,4 +98,34 @@ func (cli *Client) DetachENI(eniID string, instanceID string) error {
 	}
 
 	return cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
+}
+
+func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) error {
+	eni, err := cli.DescribeENIByID(eniID)
+	if err != nil {
+		return err
+	}
+
+	// Skip detaching if the target ENI has still not attached with the other instance
+	if eni.Attachment != nil {
+		// Do nothing if the target ENI already attached with the target instance
+		if *eni.Attachment.InstanceID == instanceID {
+			return nil
+		}
+
+		err = cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
+		if err != nil {
+			return err
+		}
+
+		// Sometimes detaching ENI is too slow
+		time.Sleep(5 * time.Second)
+	}
+
+	err = cli.AttachENI(eniID, instanceID, deviceIndex)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

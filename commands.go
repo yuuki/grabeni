@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/codegangsta/cli"
 
@@ -154,30 +153,7 @@ func doGrab(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	eni, err := cli.DescribeENIByID(eniID)
-	if err != nil {
-		assert(err)
-		os.Exit(1)
-	}
-
-	// Skip detaching if the target ENI has still not attached with the other instance
-	if eni.Attachment != nil {
-		// Do nothing if the target ENI already attached with the target instance
-		if *eni.Attachment.InstanceID == instanceID {
-			os.Exit(0)
-		}
-
-		err = cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
-		if err != nil {
-			assert(err)
-			os.Exit(1)
-		}
-
-		// Sometimes detaching ENI is too slow
-		time.Sleep(5 * time.Second)
-	}
-
-	err = cli.AttachENI(eniID, instanceID, deviceIndex)
+	err = cli.GrabENI(eniID, instanceID, deviceIndex)
 	if err != nil {
 		assert(err)
 		os.Exit(1)
