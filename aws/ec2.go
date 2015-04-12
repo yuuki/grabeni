@@ -100,22 +100,22 @@ func (cli *Client) DetachENI(eniID string, instanceID string) error {
 	return cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
 }
 
-func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) error {
+func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) (error, bool) {
 	eni, err := cli.DescribeENIByID(eniID)
 	if err != nil {
-		return err
+		return err, false
 	}
 
 	// Skip detaching if the target ENI has still not attached with the other instance
 	if eni.Attachment != nil {
 		// Do nothing if the target ENI already attached with the target instance
 		if *eni.Attachment.InstanceID == instanceID {
-			return nil
+			return nil, false
 		}
 
 		err = cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
 		if err != nil {
-			return err
+			return err, false
 		}
 
 		// Sometimes detaching ENI is too slow
@@ -124,8 +124,8 @@ func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) err
 
 	err = cli.AttachENI(eniID, instanceID, deviceIndex)
 	if err != nil {
-		return err
+		return err, false
 	}
 
-	return nil
+	return nil, true
 }

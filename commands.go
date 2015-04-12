@@ -135,8 +135,14 @@ func doGrab(c *cli.Context) {
 	cli, err := aws.NewClient(c)
 	DieIf(err)
 
-	err = cli.GrabENI(eniID, instanceID, deviceIndex)
+	err, ok := cli.GrabENI(eniID, instanceID, deviceIndex)
 	DieIf(err)
+	if !ok {
+		Logf("attached", "eni %s already attached to %s", eniID, instanceID)
+		os.Exit(0)
+	}
+
+	Logf("grabbed", "eni %s attached to instance %s", eniID, instanceID)
 }
 
 func doAttach(c *cli.Context) {
@@ -159,6 +165,8 @@ func doAttach(c *cli.Context) {
 
 	err = cli.AttachENI(eniID, instanceID, deviceIndex)
 	DieIf(err)
+
+	Logf("attached", "eni %s attached to instance %s", eniID, instanceID)
 }
 
 func doDetach(c *cli.Context) {
@@ -180,4 +188,6 @@ func doDetach(c *cli.Context) {
 
 	err = cli.DetachENI(eniID, instanceID)
 	DieIf(err)
+
+	Logf("detached", "eni %s detached from instance %s", eniID, instanceID)
 }
