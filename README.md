@@ -29,3 +29,11 @@ $ go get -d github.com/y_uuki/grabeni
 1. Run test suite with the `go test ./...` command and confirm that it passes
 1. Run `gofmt -s`
 1. Create new Pull Request
+
+# License
+
+[The MIT License](./LICENSE).
+
+# Author
+
+y_uuki <yuki.tsubo@gmail.com>
