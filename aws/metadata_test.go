@@ -24,7 +24,7 @@ func TestGetMetaData(t *testing.T) {
 	result, err := GetMetaData("test")
 
 	if err != nil {
-		t.Error("err shoud be nil but: ", err)
+		t.Error("err should be nil but: ", err)
 	}
 
 	if string(result) != "dummy" {
@@ -74,7 +74,7 @@ func TestGetInstanceID(t *testing.T) {
 	result, err := GetInstanceID()
 
 	if err != nil {
-		t.Error("err shoud be nil but: ", err)
+		t.Error("err should be nil but: ", err)
 	}
 
 	if string(result) != "i-abc10000" {
