@@ -6,17 +6,16 @@ import (
 
 	"github.com/awslabs/aws-sdk-go/aws"
 	"github.com/awslabs/aws-sdk-go/service/ec2"
-	"github.com/codegangsta/cli"
 )
 
 type Client struct {
 	*ec2.EC2
 }
 
-func NewClient(c *cli.Context) (*Client, error) {
+func NewClient(region string, accessKey string, secretKey string) (*Client, error) {
 	config := aws.DefaultConfig
 
-	config.Region = c.GlobalString("region")
+	config.Region = region
 	if config.Region == "" {
 		region, err := GetRegion()
 		if err != nil {
@@ -25,8 +24,8 @@ func NewClient(c *cli.Context) (*Client, error) {
 		config.Region = region
 	}
 
-	if c.GlobalString("accesskey") != "" && c.GlobalString("secretkey") != "" {
-		config.Credentials = aws.Creds(c.GlobalString("accesskey"), c.GlobalString("secretkey"), "")
+	if accessKey != "" && secretKey != "" {
+		config.Credentials = aws.Creds(accessKey, secretKey, "")
 	}
 
 	return &Client{ec2.New(config)}, nil

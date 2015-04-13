@@ -60,6 +60,16 @@ var commandDetach = cli.Command{
 	},
 }
 
+func awsCli(c *cli.Context) *aws.Client {
+	client, err := aws.NewClient(
+		c.GlobalString("region"),
+		c.GlobalString("accesskey"),
+		c.GlobalString("secretkey"),
+	)
+	DieIf(err)
+	return client
+}
+
 func fetchInstanceIDIfEmpty(c *cli.Context) string {
 	if instanceID := c.String("instanceid"); instanceID != "" {
 		return c.String(instanceID)
@@ -86,10 +96,7 @@ func doStatus(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	cli, err := aws.NewClient(c)
-	DieIf(err)
-
-	eni, err := cli.DescribeENIByID(eniID)
+	eni, err := awsCli(c).DescribeENIByID(eniID)
 	DieIf(err)
 	if eni == nil {
 		os.Exit(0)
@@ -132,10 +139,7 @@ func doGrab(c *cli.Context) {
 	instanceID := fetchInstanceIDIfEmpty(c)
 	deviceIndex := c.Int("deviceindex")
 
-	cli, err := aws.NewClient(c)
-	DieIf(err)
-
-	err, ok := cli.GrabENI(eniID, instanceID, deviceIndex)
+	err, ok := awsCli(c).GrabENI(eniID, instanceID, deviceIndex)
 	DieIf(err)
 	if !ok {
 		Logf("attached", "eni %s already attached to %s", eniID, instanceID)
@@ -160,10 +164,7 @@ func doAttach(c *cli.Context) {
 	instanceID := fetchInstanceIDIfEmpty(c)
 	deviceIndex := c.Int("deviceindex")
 
-	cli, err := aws.NewClient(c)
-	DieIf(err)
-
-	err = cli.AttachENI(eniID, instanceID, deviceIndex)
+	err := awsCli(c).AttachENI(eniID, instanceID, deviceIndex)
 	DieIf(err)
 
 	Logf("attached", "eni %s attached to instance %s", eniID, instanceID)
@@ -183,10 +184,7 @@ func doDetach(c *cli.Context) {
 
 	instanceID := fetchInstanceIDIfEmpty(c)
 
-	cli, err := aws.NewClient(c)
-	DieIf(err)
-
-	err = cli.DetachENI(eniID, instanceID)
+	err := awsCli(c).DetachENI(eniID, instanceID)
 	DieIf(err)
 
 	Logf("detached", "eni %s detached from instance %s", eniID, instanceID)
