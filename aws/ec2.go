@@ -3,6 +3,7 @@ package aws
 import (
 	"errors"
 	"time"
+	"os"
 
 	"github.com/awslabs/aws-sdk-go/aws"
 	"github.com/awslabs/aws-sdk-go/service/ec2"
@@ -13,14 +14,19 @@ type Client struct {
 }
 
 func NewClient(region string, accessKey string, secretKey string) (*Client, error) {
-	config := aws.DefaultConfig
+	config := aws.Config{}
+	envRegion := os.Getenv("AWS_REGION")
 
-	config.Region = region
-	if config.Region == "" {
-		region, err := GetRegion()
+	if region == "" && envRegion == "" {
+		var err error
+
+		config.Region, err = GetRegion()
 		if err != nil {
 			return nil, err
 		}
+	} else if region == "" && envRegion != "" {
+		config.Region = envRegion
+	} else {
 		config.Region = region
 	}
 
@@ -28,7 +34,7 @@ func NewClient(region string, accessKey string, secretKey string) (*Client, erro
 		config.Credentials = aws.Creds(accessKey, secretKey, "")
 	}
 
-	return &Client{ec2.New(config)}, nil
+	return &Client{ec2.New(&config)}, nil
 }
 
 func (cli *Client) DescribeENIByID(eniID string) (*ec2.NetworkInterface, error) {
