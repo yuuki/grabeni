@@ -12,18 +12,18 @@ deploy:
   api_key:
     secure: kaHwhxGfLWO9f6qKeGGTUJKMJxFIt3Oa5aMhqyQLF3NtD2a4/zDVO9guj18Nxer7d3GCKSX4WYMRb6UoXYT+u05iOLE+5pxamI8F5BV25ZS040ZlHFc7YKL0ZWY6eJLgHIMpuBpJwPQIPA3eiv+1JhwfDicHHX5TIbJDZdi6w3g=
   file:
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_linux_amd64"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_linux_386"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_darwin_amd64"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_darwin_386"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_windows_amd64.exe"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_windows_386.exe"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_linux_amd64.tar.gz"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_linux_386.tar.gz"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_darwin_amd64.zip"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_darwin_386.zip"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_windows_amd64.zip"
-    - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_windows_386.zip"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_linux_amd64"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_linux_386"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_darwin_amd64"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_darwin_386"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_windows_amd64.exe"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_windows_386.exe"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_linux_amd64.tar.gz"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_linux_386.tar.gz"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_darwin_amd64.zip"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_darwin_386.zip"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_windows_amd64.zip"
+    - "/home/travis/gopath/src/github.com/yuuki1/grabeni/snapshot/grabeni_windows_386.zip"
   on:
     repo: yuuki1/grabeni
     tags: true
