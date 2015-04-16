@@ -25,5 +25,5 @@ deploy:
     - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_windows_amd64.zip"
     - "/home/travis/gopath/src/github.com/y-uuki/grabeni/snapshot/grabeni_windows_386.zip"
   on:
-    repo: y-uuki/grabeni
+    repo: yuuki1/grabeni
     tags: true
