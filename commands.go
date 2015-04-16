@@ -12,6 +12,7 @@ import (
 
 var Commands = []cli.Command{
 	commandStatus,
+	commandList,
 	commandGrab,
 	commandAttach,
 	commandDetach,
@@ -23,6 +24,14 @@ var commandStatus = cli.Command{
 	Description: `
 `,
 	Action: doStatus,
+}
+
+var commandList = cli.Command{
+	Name:  "list",
+	Usage: "Show all ENIs",
+	Description: `
+`,
+	Action: doList,
 }
 
 var commandGrab = cli.Command{
@@ -102,26 +111,21 @@ func doStatus(c *cli.Context) {
 		os.Exit(0)
 	}
 
-	name := ""
-	if len(eni.TagSet) > 0 {
-		for _, tag := range eni.TagSet {
-			if *tag.Key == "Name" {
-				name = *tag.Value
-				break
-			}
-		}
+	fmt.Println(StatusHeader())
+	fmt.Printf(StatusRow(eni))
+}
+
+func doList(c *cli.Context) {
+	enis, err := awsCli(c).DescribeENIs()
+	DieIf(err)
+	if enis == nil {
+		os.Exit(0)
 	}
 
-	fmt.Println("Name\tNetworkInterfaceID\tPrivateDNSName\tPrivateIPAddress\tInstanceID\tDeviceIndex\tStatus")
-	fmt.Printf("%s\t%s\t%s\t%s\t%s\t%d\t%s\t\n",
-		name,
-		*eni.NetworkInterfaceID,
-		*eni.PrivateDNSName,
-		*eni.PrivateIPAddress,
-		*eni.Attachment.InstanceID,
-		*eni.Attachment.DeviceIndex,
-		*eni.Status,
-	)
+	fmt.Println(StatusHeader())
+	for _, eni := range enis {
+		fmt.Printf(StatusRow(eni))
+	}
 }
 
 func doGrab(c *cli.Context) {
