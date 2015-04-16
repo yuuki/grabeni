@@ -8,15 +8,35 @@ grabeni
 [travis]: http://travis-ci.org/y-uuki/grabeni
 [godocs]: http://godoc.org/github.com/y-uuki/grabeni
 
-grabeni - Grab ENI tool from an other EC2 instance.
+grabeni - ENI Grabbing tool from an other EC2 instance.
+
+Detaching and attaching (grabbing) ENI is a common way to realize VIP in EC2 with Heartbeat and Keepalived.
+`grabeni` provides command line interface for grabing ENI.
 
 # Usage
 
 ```shell
-grabeni status <eniId>
-grabeni grab <eniId> [-d <deviceIndex>] [-i <instanceId>] [--dryrun]
-grabeni attach [<eniId>] [-d <deviceIndex>] [-i <instanceId>] [--dryrun]
-grabeni detach [<eniId>] [-i <instanceId>] [--dryrun]
+export AWS_ACCESS_KEY_ID='...'
+export AWS_SECRET_ACCESS_KEY='...'
+export AWS_REGION='us-east-1'
+grabeni grab eni-xxxxxx --instanceid i-xxxxxxd # attach eni-xxxxxx to EC2 instance where grabeni runs if instanceid option is skipped
+```
+
+# Example
+
+```shell
+grabeni list
+NetworkInterfaceID	PrivateDNSName				PrivateIPAddress	InstanceID	DeviceIndex	Status	Name
+eni-0000000	  ip-10-0-0-100.ap-northeast-1.compute.internal	10.0.0.100	   0		in-use
+eni-1111111		ip-10-0-0-10.ap-northeast-1.compute.internal	10.0.0.10			-1		available	eni01
+eni-2222222		ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11	     1		in-use	eni02
+
+grabeni status eni-2222222
+NetworkInterfaceID	PrivateDNSName				PrivateIPAddress	InstanceID	DeviceIndex	Status	Name
+eni-2222222		ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11	     1		in-use	eni02
+
+grabeni grab eni-2222222
+grabbed: eni eni-2222222 attached to instance i-xxxxxx
 ```
 
 # Install
