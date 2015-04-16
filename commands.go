@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/codegangsta/cli"
 
@@ -20,53 +21,98 @@ var Commands = []cli.Command{
 
 var commandStatus = cli.Command{
 	Name:  "status",
-	Usage: "Show ENI status",
+	Usage: "show ENI status",
 	Description: `
+    Show the information of the ENI identified with <eni-id>.
 `,
 	Action: doStatus,
 }
 
 var commandList = cli.Command{
 	Name:  "list",
-	Usage: "Show all ENIs",
+	Usage: "show all ENIs",
 	Description: `
+    List the ENIs owned by your account.
 `,
 	Action: doList,
 }
 
 var commandGrab = cli.Command{
 	Name:  "grab",
-	Usage: "Detach and attach ENI",
+	Usage: "detach and attach ENI",
 	Description: `
+    Detach the ENI identified with <eni-id> whether the eni has already attached or not. And then attach the ENI to EC2 instance identified with --instanceid option.
 `,
 	Action: doGrab,
 	Flags: []cli.Flag{
-		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "Device Index Number"},
-		cli.StringFlag{Name: "i, instanceid", Usage: "Instance Id"},
+		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "device index number"},
+		cli.StringFlag{Name: "i, instanceid", Usage: "attach-targeted instance id"},
 	},
 }
 
 var commandAttach = cli.Command{
 	Name:  "attach",
-	Usage: "",
+	Usage: "attach ENI",
 	Description: `
+    Just attach the ENI identified with <eni-id> to EC2 instance identified with --instanceid option.
 `,
 	Action: doAttach,
 	Flags: []cli.Flag{
-		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "Device Index Number"},
-		cli.StringFlag{Name: "i, instanceid", Usage: "Instance Id"},
+		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "device index number"},
+		cli.StringFlag{Name: "i, instanceid", Usage: "attach-targeted instance id"},
 	},
 }
 
 var commandDetach = cli.Command{
 	Name:  "detach",
-	Usage: "",
+	Usage: "detach ENI",
 	Description: `
+    Just detach the ENI identified with <eni-id>.
 `,
 	Action: doDetach,
 	Flags: []cli.Flag{
-		cli.StringFlag{Name: "i, instanceid", Usage: "Instance Id"},
+		cli.StringFlag{Name: "i, instanceid", Usage: "detach-targeted instance id"},
 	},
+}
+
+type commandDoc struct {
+	Parent    string
+	Arguments string
+}
+
+var commandDocs = map[string]commandDoc{
+	"status": {"", "<eni-id>"},
+	"list":  {"", ""},
+	"grab": {"", "[--deviceindex | -d <device index> (default: 1)] [--instanceid | -i <instance id>] <eni-id>"},
+	"attach": {"", "[--deviceindex | -d <device index> (default: 1)] [--instanceid | -i <instance id>] <eni-id>"},
+	"detach":  {"", "[--instanceid | -i <instance id>] <eni-id>"},
+}
+
+// Makes template conditionals to generate per-command documents.
+func mkCommandsTemplate(genTemplate func(commandDoc) string) string {
+	template := "{{if false}}"
+	for _, command := range append(Commands) {
+		template = template + fmt.Sprintf("{{else if (eq .Name %q)}}%s", command.Name, genTemplate(commandDocs[command.Name]))
+	}
+	return template + "{{end}}"
+}
+
+func init() {
+	argsTemplate := mkCommandsTemplate(func(doc commandDoc) string { return doc.Arguments })
+	parentTemplate := mkCommandsTemplate(func(doc commandDoc) string { return string(strings.TrimLeft(doc.Parent+" ", " ")) })
+
+	cli.CommandHelpTemplate = `NAME:
+    {{.Name}} - {{.Usage}}
+
+USAGE:
+    grabeni ` + parentTemplate + `{{.Name}} ` + argsTemplate + `
+{{if (len .Description)}}
+DESCRIPTION: {{.Description}}
+{{end}}{{if (len .Flags)}}
+OPTIONS:
+    {{range .Flags}}{{.}}
+    {{end}}
+{{end}}`
 }
 
 func awsCli(c *cli.Context) *aws.Client {
