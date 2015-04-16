@@ -112,7 +112,7 @@ func doStatus(c *cli.Context) {
 	}
 
 	fmt.Println(StatusHeader())
-	fmt.Printf(StatusRow(eni))
+	fmt.Println(StatusRow(eni))
 }
 
 func doList(c *cli.Context) {
@@ -124,7 +124,7 @@ func doList(c *cli.Context) {
 
 	fmt.Println(StatusHeader())
 	for _, eni := range enis {
-		fmt.Printf(StatusRow(eni))
+		fmt.Println(StatusRow(eni))
 	}
 }
 

@@ -35,7 +35,7 @@ func StatusRow(eni *ec2.NetworkInterface) string {
 		}
 	}
 
-	return fmt.Sprintf("%s\t\t%s\t%s\t%s\t%d\t\t%s\t%s\t\n",
+	return fmt.Sprintf("%s\t\t%s\t%s\t%s\t%d\t\t%s\t%s",
 		*eni.NetworkInterfaceID,
 		*eni.PrivateDNSName,
 		*eni.PrivateIPAddress,
