@@ -1,12 +1,12 @@
 grabeni
 =======
-[![Latest Version](http://img.shields.io/github/release/y-uuki/grabeni.svg?style=flat-square)][release]
-[![Build Status](http://img.shields.io/travis/y-uuki/grabeni.svg?style=flat-square)][travis]
+[![Latest Version](http://img.shields.io/github/release/yuuki1/grabeni.svg?style=flat-square)][release]
+[![Build Status](http://img.shields.io/travis/yuuki1/grabeni.svg?style=flat-square)][travis]
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
 
-[release]: https://github.com/y-uuki/grabeni/releases
-[travis]: http://travis-ci.org/y-uuki/grabeni
-[godocs]: http://godoc.org/github.com/y-uuki/grabeni
+[release]: https://github.com/yuuki1/grabeni/releases
+[travis]: http://travis-ci.org/yuuki1/grabeni
+[godocs]: http://godoc.org/github.com/yuuki1/grabeni
 
 grabeni - ENI Grabbing tool from an other EC2 instance.
 

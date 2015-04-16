@@ -21,7 +21,7 @@ var Commands = []cli.Command{
 
 var commandStatus = cli.Command{
 	Name:  "status",
-	Usage: "show ENI status",
+	Usage: "Show ENI status",
 	Description: `
     Show the information of the ENI identified with <eni-id>.
 `,
@@ -30,7 +30,7 @@ var commandStatus = cli.Command{
 
 var commandList = cli.Command{
 	Name:  "list",
-	Usage: "show all ENIs",
+	Usage: "Show all ENIs",
 	Description: `
     List the ENIs owned by your account.
 `,
@@ -39,7 +39,7 @@ var commandList = cli.Command{
 
 var commandGrab = cli.Command{
 	Name:  "grab",
-	Usage: "detach and attach ENI",
+	Usage: "Detach and attach ENI",
 	Description: `
     Detach the ENI identified with <eni-id> whether the eni has already attached or not. And then attach the ENI to EC2 instance identified with --instanceid option.
 `,
@@ -52,7 +52,7 @@ var commandGrab = cli.Command{
 
 var commandAttach = cli.Command{
 	Name:  "attach",
-	Usage: "attach ENI",
+	Usage: "Attach ENI",
 	Description: `
     Just attach the ENI identified with <eni-id> to EC2 instance identified with --instanceid option.
 `,
@@ -65,7 +65,7 @@ var commandAttach = cli.Command{
 
 var commandDetach = cli.Command{
 	Name:  "detach",
-	Usage: "detach ENI",
+	Usage: "Detach ENI",
 	Description: `
     Just detach the ENI identified with <eni-id>.
 `,
