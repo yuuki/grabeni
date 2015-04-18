@@ -191,17 +191,19 @@ func doGrab(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	err, ok := awsCli(c).GrabENI(&aws.GrabENIParam{
+	instanceID := fetchInstanceIDIfEmpty(c)
+
+	eni, err := awsCli(c).GrabENI(&aws.GrabENIParam{
 		InterfaceID: eniID,
-		InstanceID: fetchInstanceIDIfEmpty(c),
+		InstanceID: instanceID,
 		DeviceIndex: c.Int("deviceindex"),
 	}, &aws.RetryParam{
 		TimeoutSec: int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
 	DieIf(err)
-	if !ok {
-		Logf("attached", "eni %s already attached to %s", eniID, instanceID)
+	if eni == nil {
+		Logf("attached", "eni %s already attached to instance %s", eniID, instanceID)
 		os.Exit(0)
 	}
 
@@ -220,15 +222,21 @@ func doAttach(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	err := awsCli(c).AttachENIWithRetry(&aws.AttachENIParam{
+	instanceID := fetchInstanceIDIfEmpty(c)
+
+	eni, err := awsCli(c).AttachENIWithRetry(&aws.AttachENIParam{
 		InterfaceID: eniID,
-		InstanceID: fetchInstanceIDIfEmpty(c),
+		InstanceID: instanceID,
 		DeviceIndex: c.Int("deviceindex"),
 	}, &aws.RetryParam{
 		TimeoutSec: int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
 	DieIf(err)
+	if eni == nil {
+		Logf("attached", "eni %s already attached to instance %s", eniID, instanceID)
+		os.Exit(0)
+	}
 
 	Logf("attached", "eni %s attached to instance %s", eniID, instanceID)
 }
@@ -245,13 +253,17 @@ func doDetach(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	err := awsCli(c).DetachENIWithRetry(&aws.DetachENIParam{
+	eni, err := awsCli(c).DetachENIWithRetry(&aws.DetachENIParam{
 		InterfaceID: eniID,
 	}, &aws.RetryParam{
 		TimeoutSec: int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
 	DieIf(err)
+	if eni == nil {
+		Logf("detached", "eni %s already detached", eniID)
+		os.Exit(0)
+	}
 
 	Logf("detached", "eni %s detached", eniID)
 }
