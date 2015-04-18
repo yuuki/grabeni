@@ -132,7 +132,7 @@ func awsCli(c *cli.Context) *aws.Client {
 
 func fetchInstanceIDIfEmpty(c *cli.Context) string {
 	if instanceID := c.String("instanceid"); instanceID != "" {
-		return c.String(instanceID)
+		return instanceID
 	}
 
 	instanceID, err := aws.GetInstanceID()
