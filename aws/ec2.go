@@ -2,6 +2,7 @@ package aws
 
 import (
 	"errors"
+	"fmt"
 	"time"
 	"os"
 
@@ -11,6 +12,45 @@ import (
 
 type Client struct {
 	*ec2.EC2
+}
+
+type AttachENIParam struct {
+	InterfaceID string
+	InstanceID string
+	DeviceIndex int
+}
+
+type DetachENIParam struct {
+	InterfaceID string
+}
+
+type GrabENIParam AttachENIParam
+
+type RetryParam struct {
+	TimeoutSec int64
+	IntervalSec int64
+}
+
+func validateRetryParam(param *RetryParam) error {
+	if param == nil {
+		return errors.New(fmt.Sprintf("RetryParam require"))
+	}
+
+	if param.TimeoutSec <= 0 {
+		return errors.New(fmt.Sprintf("invalid timeout (%d) seconds", param.TimeoutSec))
+	}
+	if param.IntervalSec <= 0 {
+		return errors.New(fmt.Sprintf("invalid interval (%d) seconds", param.IntervalSec))
+	}
+	if param.TimeoutSec < param.IntervalSec {
+		return errors.New(fmt.Sprintf(
+			"interval (%d) should be less than timeout (%d) seconds",
+			param.IntervalSec,
+			param.TimeoutSec,
+		))
+	}
+
+	return nil
 }
 
 func NewClient(region string, accessKey string, secretKey string) (*Client, error) {
@@ -37,10 +77,10 @@ func NewClient(region string, accessKey string, secretKey string) (*Client, erro
 	return &Client{ec2.New(&config)}, nil
 }
 
-func (cli *Client) DescribeENIByID(eniID string) (*ec2.NetworkInterface, error) {
+func (cli *Client) DescribeENIByID(InterfaceID string) (*ec2.NetworkInterface, error) {
 	params := &ec2.DescribeNetworkInterfacesInput{
 		NetworkInterfaceIDs: []*string{
-			aws.String(eniID),
+			aws.String(InterfaceID),
 		},
 	}
 	resp, err := cli.EC2.DescribeNetworkInterfaces(params)
@@ -76,20 +116,47 @@ func (cli *Client) DescribeENIs() ([]*ec2.NetworkInterface, error) {
 	return resp.NetworkInterfaces, nil
 }
 
-func (cli *Client) AttachENI(eniID string, instanceID string, deviceIndex int) error {
-	params := &ec2.AttachNetworkInterfaceInput{
-		NetworkInterfaceID: aws.String(eniID),
-		InstanceID:         aws.String(instanceID),
-		DeviceIndex:        aws.Long(int64(deviceIndex)),
+func (cli *Client) AttachENI(param *AttachENIParam) error {
+	input := &ec2.AttachNetworkInterfaceInput{
+		NetworkInterfaceID: aws.String(param.InterfaceID),
+		InstanceID:         aws.String(param.InstanceID),
+		DeviceIndex:        aws.Long(int64(param.DeviceIndex)),
 	}
-	_, err := cli.EC2.AttachNetworkInterface(params)
-
+	_, err := cli.EC2.AttachNetworkInterface(input)
 	if awserr := aws.Error(err); awserr != nil {
 		// A service error occurred.
 		return errors.New(awserr.Error())
 	} else if err != nil {
 		// A non-service error occurred.
 		return err
+	}
+
+	return nil
+}
+
+func (cli *Client) AttachENIWithRetry(param *AttachENIParam, retryParam *RetryParam) error {
+	if err := validateRetryParam(retryParam); err != nil {
+		return err
+	}
+
+	if err := cli.AttachENI(param); err != nil {
+		return err
+	}
+
+	// Retry until attach event completed or timeout
+	for {
+		select {
+		case <-time.After(time.Duration(retryParam.TimeoutSec) * time.Second):
+			return errors.New(fmt.Sprintf("timeout occured. %d seconds elapsed.", retryParam.TimeoutSec))
+		case <-time.Tick(time.Duration(retryParam.IntervalSec) * time.Second):
+			eni, err := cli.DescribeENIByID(param.InterfaceID)
+			if err != nil {
+				return err
+			}
+			if *eni.Status == "in-use" && eni.Attachment != nil && *eni.Attachment.Status == "attached" {
+				return nil // detach completed
+			}
+		}
 	}
 
 	return nil
@@ -113,8 +180,8 @@ func (cli *Client) DetachENIByAttachmentID(attachmentID string) error {
 	return nil
 }
 
-func (cli *Client) DetachENI(eniID string) error {
-	eni, err := cli.DescribeENIByID(eniID)
+func (cli *Client) DetachENI(param *DetachENIParam) error {
+	eni, err := cli.DescribeENIByID(param.InterfaceID)
 	if err != nil {
 		return err
 	}
@@ -124,11 +191,43 @@ func (cli *Client) DetachENI(eniID string) error {
 		return nil
 	}
 
-	return cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
+	if err := cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) (error, bool) {
-	eni, err := cli.DescribeENIByID(eniID)
+func (cli *Client) DetachENIWithRetry(param *DetachENIParam, retryParam *RetryParam) error {
+	if err := validateRetryParam(retryParam); err != nil {
+		return err
+	}
+
+	if err := cli.DetachENI(param); err != nil {
+		return err
+	}
+
+	// Retry until detach event completed or timeout
+	for {
+		select {
+		case <-time.After(time.Duration(retryParam.TimeoutSec) * time.Second):
+			return errors.New(fmt.Sprintf("timeout occured. %d seconds elapsed.", retryParam.TimeoutSec))
+		case <-time.Tick(time.Duration(retryParam.IntervalSec) * time.Second):
+			eni, err := cli.DescribeENIByID(param.InterfaceID)
+			if err != nil {
+				return err
+			}
+			if *eni.Status == "available" {
+				return nil // detach completed
+			}
+		}
+	}
+
+	return nil
+}
+
+func (cli *Client) GrabENI(param *GrabENIParam, retryParam *RetryParam) (error, bool) {
+	eni, err := cli.DescribeENIByID(param.InterfaceID)
 	if err != nil {
 		return err, false
 	}
@@ -136,21 +235,17 @@ func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) (er
 	// Skip detaching if the target ENI has still not attached with the other instance
 	if eni.Attachment != nil {
 		// Do nothing if the target ENI already attached with the target instance
-		if *eni.Attachment.InstanceID == instanceID {
+		if *eni.Attachment.InstanceID == param.InstanceID {
 			return nil, false
 		}
 
-		err = cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
-		if err != nil {
+		if err := cli.DetachENIWithRetry(&DetachENIParam{InterfaceID: param.InterfaceID}, retryParam); err != nil {
 			return err, false
 		}
-
-		// Sometimes detaching ENI is too slow
-		time.Sleep(10 * time.Second)
 	}
 
-	err = cli.AttachENI(eniID, instanceID, deviceIndex)
-	if err != nil {
+	p := AttachENIParam(*param)
+	if err := cli.AttachENIWithRetry(&p, retryParam); err != nil {
 		return err, false
 	}
 

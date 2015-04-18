@@ -46,7 +46,9 @@ var commandGrab = cli.Command{
 	Action: doGrab,
 	Flags: []cli.Flag{
 		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "device index number"},
-		cli.StringFlag{Name: "i, instanceid", Usage: "attach-targeted instance id"},
+		cli.StringFlag{Name: "I, instanceid", Usage: "attach-targeted instance id"},
+		cli.IntFlag{Name: "t, timeout", Value: 10, Usage: "each attach and detach API request timeout seconds"},
+		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "each attach and detach API request polling interval seconds"},
 	},
 }
 
@@ -59,7 +61,9 @@ var commandAttach = cli.Command{
 	Action: doAttach,
 	Flags: []cli.Flag{
 		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "device index number"},
-		cli.StringFlag{Name: "i, instanceid", Usage: "attach-targeted instance id"},
+		cli.StringFlag{Name: "I, instanceid", Usage: "attach-targeted instance id"},
+		cli.IntFlag{Name: "t, timeout", Value: 10, Usage: "each attach and detach API request timeout seconds"},
+		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "each attach and detach API request polling interval seconds"},
 	},
 }
 
@@ -70,6 +74,10 @@ var commandDetach = cli.Command{
     Just detach the ENI identified with <eni-id>.
 `,
 	Action: doDetach,
+	Flags: []cli.Flag{
+		cli.IntFlag{Name: "t, timeout", Value: 10, Usage: "each attach and detach API request timeout seconds"},
+		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "each attach and detach API request polling interval seconds"},
+	},
 }
 
 type commandDoc struct {
@@ -186,7 +194,14 @@ func doGrab(c *cli.Context) {
 	instanceID := fetchInstanceIDIfEmpty(c)
 	deviceIndex := c.Int("deviceindex")
 
-	err, ok := awsCli(c).GrabENI(eniID, instanceID, deviceIndex)
+	err, ok := awsCli(c).GrabENI(&aws.GrabENIParam{
+		InterfaceID: eniID,
+		InstanceID: instanceID,
+		DeviceIndex: deviceIndex,
+	}, &aws.RetryParam{
+		TimeoutSec: int64(c.Int("timeout")),
+		IntervalSec: int64(c.Int("interval")),
+	})
 	DieIf(err)
 	if !ok {
 		Logf("attached", "eni %s already attached to %s", eniID, instanceID)
@@ -211,7 +226,14 @@ func doAttach(c *cli.Context) {
 	instanceID := fetchInstanceIDIfEmpty(c)
 	deviceIndex := c.Int("deviceindex")
 
-	err := awsCli(c).AttachENI(eniID, instanceID, deviceIndex)
+	err := awsCli(c).AttachENIWithRetry(&aws.AttachENIParam{
+		InterfaceID: eniID,
+		InstanceID: instanceID,
+		DeviceIndex: deviceIndex,
+	}, &aws.RetryParam{
+		TimeoutSec: int64(c.Int("timeout")),
+		IntervalSec: int64(c.Int("interval")),
+	})
 	DieIf(err)
 
 	Logf("attached", "eni %s attached to instance %s", eniID, instanceID)
@@ -229,7 +251,12 @@ func doDetach(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	err := awsCli(c).DetachENI(eniID)
+	err := awsCli(c).DetachENIWithRetry(&aws.DetachENIParam{
+		InterfaceID: eniID,
+	}, &aws.RetryParam{
+		TimeoutSec: int64(c.Int("timeout")),
+		IntervalSec: int64(c.Int("interval")),
+	})
 	DieIf(err)
 
 	Logf("detached", "eni %s detached", eniID)
