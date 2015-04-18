@@ -70,9 +70,6 @@ var commandDetach = cli.Command{
     Just detach the ENI identified with <eni-id>.
 `,
 	Action: doDetach,
-	Flags: []cli.Flag{
-		cli.StringFlag{Name: "i, instanceid", Usage: "detach-targeted instance id"},
-	},
 }
 
 type commandDoc struct {
@@ -85,7 +82,7 @@ var commandDocs = map[string]commandDoc{
 	"list":  {"", ""},
 	"grab": {"", "[--deviceindex | -d <device index> (default: 1)] [--instanceid | -i <instance id>] <eni-id>"},
 	"attach": {"", "[--deviceindex | -d <device index> (default: 1)] [--instanceid | -i <instance id>] <eni-id>"},
-	"detach":  {"", "[--instanceid | -i <instance id>] <eni-id>"},
+	"detach":  {"", "<eni-id>"},
 }
 
 // Makes template conditionals to generate per-command documents.
@@ -232,10 +229,8 @@ func doDetach(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	instanceID := fetchInstanceIDIfEmpty(c)
-
-	err := awsCli(c).DetachENI(eniID, instanceID)
+	err := awsCli(c).DetachENI(eniID)
 	DieIf(err)
 
-	Logf("detached", "eni %s detached from instance %s", eniID, instanceID)
+	Logf("detached", "eni %s detached", eniID)
 }

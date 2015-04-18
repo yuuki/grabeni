@@ -113,7 +113,7 @@ func (cli *Client) DetachENIByAttachmentID(attachmentID string) error {
 	return nil
 }
 
-func (cli *Client) DetachENI(eniID string, instanceID string) error {
+func (cli *Client) DetachENI(eniID string) error {
 	eni, err := cli.DescribeENIByID(eniID)
 	if err != nil {
 		return err
