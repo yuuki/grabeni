@@ -213,7 +213,7 @@ func doAttach(c *cli.Context) {
 	instanceID := fetchInstanceIDIfEmpty(c)
 	deviceIndex := c.Int("deviceindex")
 
-	err := awsCli(c).AttachENI(eniID, instanceID, deviceIndex)
+	err := awsCli(c).AttachENIWithRetry(eniID, instanceID, deviceIndex)
 	DieIf(err)
 
 	Logf("attached", "eni %s attached to instance %s", eniID, instanceID)

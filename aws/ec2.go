@@ -108,6 +108,30 @@ func (cli *Client) AttachENI(eniID string, instanceID string, deviceIndex int) e
 	return nil
 }
 
+func (cli *Client) AttachENIWithRetry(eniID string, instanceID string, deviceIndex int) error {
+	if err := cli.AttachENI(eniID, instanceID, deviceIndex); err != nil {
+		return err
+	}
+
+	// Retry until attach event completed or timeout
+	for {
+		select {
+		case <-time.After(cli.Timeout):
+			return errors.New(fmt.Sprintf("timeout occured. %d seconds elapsed.", cli.Timeout))
+		case <-time.Tick(cli.Interval):
+			eni, err := cli.DescribeENIByID(eniID)
+			if err != nil {
+				return err
+			}
+			if *eni.Status == "in-use" && eni.Attachment != nil && *eni.Attachment.Status == "attached" {
+				return nil // detach completed
+			}
+		}
+	}
+
+	return nil
+}
+
 func (cli *Client) DetachENIByAttachmentID(attachmentID string) error {
 	params := &ec2.DetachNetworkInterfaceInput{
 		AttachmentID: aws.String(attachmentID),
