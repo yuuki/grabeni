@@ -7,8 +7,8 @@ import (
 
 	"github.com/codegangsta/cli"
 
-	"github.com/y-uuki/grabeni/aws"
-	. "github.com/y-uuki/grabeni/log"
+	"github.com/yuuki1/grabeni/aws"
+	. "github.com/yuuki1/grabeni/log"
 )
 
 var Commands = []cli.Command{
