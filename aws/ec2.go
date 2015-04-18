@@ -148,7 +148,7 @@ func (cli *Client) AttachENIWithRetry(param *AttachENIParam, retryParam *RetryPa
 		select {
 		case <-time.After(time.Duration(retryParam.TimeoutSec) * time.Second):
 			return errors.New(fmt.Sprintf("timeout occured. %d seconds elapsed.", retryParam.TimeoutSec))
-		case <-time.Tick(time.Duration(retryParam.TimeoutSec) * time.Second):
+		case <-time.Tick(time.Duration(retryParam.IntervalSec) * time.Second):
 			eni, err := cli.DescribeENIByID(param.InterfaceID)
 			if err != nil {
 				return err
@@ -212,7 +212,7 @@ func (cli *Client) DetachENIWithRetry(param *DetachENIParam, retryParam *RetryPa
 		select {
 		case <-time.After(time.Duration(retryParam.TimeoutSec) * time.Second):
 			return errors.New(fmt.Sprintf("timeout occured. %d seconds elapsed.", retryParam.TimeoutSec))
-		case <-time.Tick(time.Duration(retryParam.TimeoutSec) * time.Second):
+		case <-time.Tick(time.Duration(retryParam.IntervalSec) * time.Second):
 			eni, err := cli.DescribeENIByID(param.InterfaceID)
 			if err != nil {
 				return err
