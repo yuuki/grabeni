@@ -2,6 +2,7 @@ package aws
 
 import (
 	"errors"
+	"fmt"
 	"time"
 	"os"
 
@@ -11,9 +12,21 @@ import (
 
 type Client struct {
 	*ec2.EC2
+	Timeout time.Duration
+	Interval time.Duration
 }
 
-func NewClient(region string, accessKey string, secretKey string) (*Client, error) {
+func NewClient(region string, accessKey string, secretKey string, timeoutSec int, intervalSec int) (*Client, error) {
+	if timeoutSec <= 0 {
+		return nil, errors.New("invalid timeout")
+	}
+	if intervalSec <= 0 {
+		return nil, errors.New("invalid interval")
+	}
+	if timeoutSec < intervalSec {
+		return nil, errors.New("interval should be less than timeout")
+	}
+
 	config := aws.Config{}
 	envRegion := os.Getenv("AWS_REGION")
 
@@ -34,7 +47,7 @@ func NewClient(region string, accessKey string, secretKey string) (*Client, erro
 		config.Credentials = aws.Creds(accessKey, secretKey, "")
 	}
 
-	return &Client{ec2.New(&config)}, nil
+	return &Client{ec2.New(&config), time.Duration(timeoutSec) * time.Second, time.Duration(intervalSec) * time.Second}, nil
 }
 
 func (cli *Client) DescribeENIByID(eniID string) (*ec2.NetworkInterface, error) {
@@ -127,6 +140,30 @@ func (cli *Client) DetachENI(eniID string) error {
 	return cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
 }
 
+func (cli *Client) DetachENIWithRetry(eniID string) error {
+	if err := cli.DetachENI(eniID); err != nil {
+		return err
+	}
+
+	// Retry until detach event completed or timeout
+	for {
+		select {
+		case <-time.After(cli.Timeout):
+			return errors.New(fmt.Sprintf("timeout occured. %d seconds elapsed.", cli.Timeout))
+		case <-time.Tick(cli.Interval):
+			eni, err := cli.DescribeENIByID(eniID)
+			if err != nil {
+				return err
+			}
+			if *eni.Status == "available" {
+				return nil // detach completed
+			}
+		}
+	}
+
+	return nil
+}
+
 func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) (error, bool) {
 	eni, err := cli.DescribeENIByID(eniID)
 	if err != nil {
@@ -144,9 +181,6 @@ func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) (er
 		if err != nil {
 			return err, false
 		}
-
-		// Sometimes detaching ENI is too slow
-		time.Sleep(10 * time.Second)
 	}
 
 	err = cli.AttachENI(eniID, instanceID, deviceIndex)

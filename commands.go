@@ -117,6 +117,8 @@ func awsCli(c *cli.Context) *aws.Client {
 		c.GlobalString("region"),
 		c.GlobalString("accesskey"),
 		c.GlobalString("secretkey"),
+		10,
+		2,
 	)
 	DieIf(err)
 	return client
@@ -229,7 +231,7 @@ func doDetach(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	err := awsCli(c).DetachENI(eniID)
+	err := awsCli(c).DetachENIWithRetry(eniID)
 	DieIf(err)
 
 	Logf("detached", "eni %s detached", eniID)
