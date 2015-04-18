@@ -191,6 +191,8 @@ func doGrab(c *cli.Context) {
 		os.Exit(1)
 	}
 
+	instanceID := fetchInstanceIDIfEmpty(c)
+
 	err, ok := awsCli(c).GrabENI(&aws.GrabENIParam{
 		InterfaceID: eniID,
 		InstanceID: fetchInstanceIDIfEmpty(c),
@@ -220,9 +222,11 @@ func doAttach(c *cli.Context) {
 		os.Exit(1)
 	}
 
+	instanceID := fetchInstanceIDIfEmpty(c)
+
 	err := awsCli(c).AttachENIWithRetry(&aws.AttachENIParam{
 		InterfaceID: eniID,
-		InstanceID: fetchInstanceIDIfEmpty(c),
+		InstanceID: instanceID,
 		DeviceIndex: c.Int("deviceindex"),
 	}, &aws.RetryParam{
 		TimeoutSec: int64(c.Int("timeout")),
