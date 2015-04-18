@@ -117,12 +117,24 @@ func (cli *Client) DescribeENIs() ([]*ec2.NetworkInterface, error) {
 }
 
 func (cli *Client) AttachENI(param *AttachENIParam) error {
+	eni, err := cli.DescribeENIByID(param.InterfaceID)
+	if err != nil {
+		return err
+	}
+
+	// Do nothing if the target ENI already attached with the target instance
+	if eni.Attachment != nil {
+		if *eni.Attachment.InstanceID == param.InstanceID {
+			return nil
+		}
+	}
+
 	input := &ec2.AttachNetworkInterfaceInput{
 		NetworkInterfaceID: aws.String(param.InterfaceID),
 		InstanceID:         aws.String(param.InstanceID),
 		DeviceIndex:        aws.Long(int64(param.DeviceIndex)),
 	}
-	_, err := cli.EC2.AttachNetworkInterface(input)
+	_, err = cli.EC2.AttachNetworkInterface(input)
 	if awserr := aws.Error(err); awserr != nil {
 		// A service error occurred.
 		return errors.New(awserr.Error())
@@ -226,28 +238,28 @@ func (cli *Client) DetachENIWithRetry(param *DetachENIParam, retryParam *RetryPa
 	return nil
 }
 
-func (cli *Client) GrabENI(param *GrabENIParam, retryParam *RetryParam) (error, bool) {
+func (cli *Client) GrabENI(param *GrabENIParam, retryParam *RetryParam) error {
 	eni, err := cli.DescribeENIByID(param.InterfaceID)
 	if err != nil {
-		return err, false
+		return err
 	}
 
 	// Skip detaching if the target ENI has still not attached with the other instance
 	if eni.Attachment != nil {
 		// Do nothing if the target ENI already attached with the target instance
 		if *eni.Attachment.InstanceID == param.InstanceID {
-			return nil, false
+			return nil
 		}
 
 		if err := cli.DetachENIWithRetry(&DetachENIParam{InterfaceID: param.InterfaceID}, retryParam); err != nil {
-			return err, false
+			return err
 		}
 	}
 
 	p := AttachENIParam(*param)
 	if err := cli.AttachENIWithRetry(&p, retryParam); err != nil {
-		return err, false
+		return err
 	}
 
-	return nil, true
+	return nil
 }

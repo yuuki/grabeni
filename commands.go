@@ -193,19 +193,15 @@ func doGrab(c *cli.Context) {
 
 	instanceID := fetchInstanceIDIfEmpty(c)
 
-	err, ok := awsCli(c).GrabENI(&aws.GrabENIParam{
+	err := awsCli(c).GrabENI(&aws.GrabENIParam{
 		InterfaceID: eniID,
-		InstanceID: fetchInstanceIDIfEmpty(c),
+		InstanceID: instanceID,
 		DeviceIndex: c.Int("deviceindex"),
 	}, &aws.RetryParam{
 		TimeoutSec: int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
 	DieIf(err)
-	if !ok {
-		Logf("attached", "eni %s already attached to %s", eniID, instanceID)
-		os.Exit(0)
-	}
 
 	Logf("grabbed", "eni %s attached to instance %s", eniID, instanceID)
 }
