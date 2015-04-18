@@ -201,13 +201,13 @@ func (cli *Client) GrabENI(eniID string, instanceID string, deviceIndex int) (er
 			return nil, false
 		}
 
-		err = cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
+		err = cli.DetachENIWithRetry(eniID)
 		if err != nil {
 			return err, false
 		}
 	}
 
-	err = cli.AttachENI(eniID, instanceID, deviceIndex)
+	err = cli.AttachENIWithRetry(eniID, instanceID, deviceIndex)
 	if err != nil {
 		return err, false
 	}
