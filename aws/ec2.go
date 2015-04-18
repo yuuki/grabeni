@@ -119,6 +119,11 @@ func (cli *Client) DetachENI(eniID string, instanceID string) error {
 		return err
 	}
 
+	if eni.Attachment == nil {
+		// already detached
+		return nil
+	}
+
 	return cli.DetachENIByAttachmentID(*eni.Attachment.AttachmentID)
 }
 
