@@ -33,21 +33,21 @@ type RetryParam struct {
 
 func validateRetryParam(param *RetryParam) error {
 	if param == nil {
-		return errors.New(fmt.Sprintf("RetryParam require"))
+		return fmt.Errorf("RetryParam require")
 	}
 
 	if param.TimeoutSec <= 0 {
-		return errors.New(fmt.Sprintf("invalid timeout (%d) seconds", param.TimeoutSec))
+		return fmt.Errorf("invalid timeout (%d) seconds", param.TimeoutSec)
 	}
 	if param.IntervalSec <= 0 {
-		return errors.New(fmt.Sprintf("invalid interval (%d) seconds", param.IntervalSec))
+		return fmt.Errorf("invalid interval (%d) seconds", param.IntervalSec)
 	}
 	if param.TimeoutSec < param.IntervalSec {
-		return errors.New(fmt.Sprintf(
+		return fmt.Errorf(
 			"interval (%d) should be less than timeout (%d) seconds",
 			param.IntervalSec,
 			param.TimeoutSec,
-		))
+		)
 	}
 
 	return nil
