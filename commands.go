@@ -87,10 +87,10 @@ type commandDoc struct {
 
 var commandDocs = map[string]commandDoc{
 	"status": {"", "<eni-id>"},
-	"list":  {"", ""},
-	"grab": {"", "[--deviceindex | -d <device index> (default: 1)] [--instanceid | -i <instance id>] <eni-id>"},
+	"list":   {"", ""},
+	"grab":   {"", "[--deviceindex | -d <device index> (default: 1)] [--instanceid | -i <instance id>] <eni-id>"},
 	"attach": {"", "[--deviceindex | -d <device index> (default: 1)] [--instanceid | -i <instance id>] <eni-id>"},
-	"detach":  {"", "<eni-id>"},
+	"detach": {"", "<eni-id>"},
 }
 
 // Makes template conditionals to generate per-command documents.
@@ -195,10 +195,10 @@ func doGrab(c *cli.Context) {
 
 	eni, err := awsCli(c).GrabENI(&aws.GrabENIParam{
 		InterfaceID: eniID,
-		InstanceID: instanceID,
+		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
 	}, &aws.RetryParam{
-		TimeoutSec: int64(c.Int("timeout")),
+		TimeoutSec:  int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
 	DieIf(err)
@@ -226,10 +226,10 @@ func doAttach(c *cli.Context) {
 
 	eni, err := awsCli(c).AttachENIWithRetry(&aws.AttachENIParam{
 		InterfaceID: eniID,
-		InstanceID: instanceID,
+		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
 	}, &aws.RetryParam{
-		TimeoutSec: int64(c.Int("timeout")),
+		TimeoutSec:  int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
 	DieIf(err)
@@ -256,7 +256,7 @@ func doDetach(c *cli.Context) {
 	eni, err := awsCli(c).DetachENIWithRetry(&aws.DetachENIParam{
 		InterfaceID: eniID,
 	}, &aws.RetryParam{
-		TimeoutSec: int64(c.Int("timeout")),
+		TimeoutSec:  int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
 	DieIf(err)

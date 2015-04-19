@@ -3,8 +3,8 @@ package aws
 import (
 	"errors"
 	"fmt"
-	"time"
 	"os"
+	"time"
 
 	"github.com/awslabs/aws-sdk-go/aws"
 	"github.com/awslabs/aws-sdk-go/service/ec2"
@@ -16,7 +16,7 @@ type Client struct {
 
 type AttachENIParam struct {
 	InterfaceID string
-	InstanceID string
+	InstanceID  string
 	DeviceIndex int
 }
 
@@ -27,7 +27,7 @@ type DetachENIParam struct {
 type GrabENIParam AttachENIParam
 
 type RetryParam struct {
-	TimeoutSec int64
+	TimeoutSec  int64
 	IntervalSec int64
 }
 
