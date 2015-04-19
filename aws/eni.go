@@ -10,8 +10,16 @@ import (
 	"github.com/awslabs/aws-sdk-go/service/ec2"
 )
 
+// ENIClient is interface that implements only methods about ENI of the all methods that ec2.EC2 has
+// ENIClient helps to mock ec2.EC2 class for unit testing
+type ENIClient interface {
+	DescribeNetworkInterfaces(*ec2.DescribeNetworkInterfacesInput) (*ec2.DescribeNetworkInterfacesOutput, error)
+	AttachNetworkInterface(*ec2.AttachNetworkInterfaceInput) (*ec2.AttachNetworkInterfaceOutput, error)
+	DetachNetworkInterface(*ec2.DetachNetworkInterfaceInput) (*ec2.DetachNetworkInterfaceOutput, error)
+}
+
 type Client struct {
-	*ec2.EC2
+	ENI	ENIClient
 }
 
 type AttachENIParam struct {
@@ -83,7 +91,7 @@ func (cli *Client) DescribeENIByID(InterfaceID string) (*ec2.NetworkInterface, e
 			aws.String(InterfaceID),
 		},
 	}
-	resp, err := cli.EC2.DescribeNetworkInterfaces(params)
+	resp, err := cli.ENI.DescribeNetworkInterfaces(params)
 	if awserr := aws.Error(err); awserr != nil {
 		// A service error occurred.
 		return nil, errors.New(awserr.Error())
@@ -100,7 +108,7 @@ func (cli *Client) DescribeENIByID(InterfaceID string) (*ec2.NetworkInterface, e
 }
 
 func (cli *Client) DescribeENIs() ([]*ec2.NetworkInterface, error) {
-	resp, err := cli.EC2.DescribeNetworkInterfaces(nil)
+	resp, err := cli.ENI.DescribeNetworkInterfaces(nil)
 	if awserr := aws.Error(err); awserr != nil {
 		// A service error occurred.
 		return nil, errors.New(awserr.Error())
@@ -134,7 +142,7 @@ func (cli *Client) AttachENI(param *AttachENIParam) (*ec2.NetworkInterface, erro
 		InstanceID:         aws.String(param.InstanceID),
 		DeviceIndex:        aws.Long(int64(param.DeviceIndex)),
 	}
-	_, err = cli.EC2.AttachNetworkInterface(input)
+	_, err = cli.ENI.AttachNetworkInterface(input)
 	if awserr := aws.Error(err); awserr != nil {
 		// A service error occurred.
 		return nil, errors.New(awserr.Error())
@@ -179,7 +187,7 @@ func (cli *Client) DetachENIByAttachmentID(attachmentID string) error {
 		AttachmentID: aws.String(attachmentID),
 		Force:        aws.Boolean(false),
 	}
-	_, err := cli.EC2.DetachNetworkInterface(params)
+	_, err := cli.ENI.DetachNetworkInterface(params)
 	if awserr := aws.Error(err); awserr != nil {
 		// A service error occurred.
 		return errors.New(awserr.Error())
