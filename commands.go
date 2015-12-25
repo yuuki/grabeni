@@ -8,6 +8,7 @@ import (
 	"github.com/codegangsta/cli"
 
 	"github.com/yuuki1/grabeni/aws"
+	"github.com/yuuki1/grabeni/format"
 	. "github.com/yuuki1/grabeni/log"
 )
 
@@ -140,8 +141,7 @@ func doStatus(c *cli.Context) {
 		os.Exit(0)
 	}
 
-	fmt.Println(StatusHeader())
-	fmt.Println(StatusRow(eni))
+	format.PrintENI(os.Stdout, eni)
 }
 
 func doList(c *cli.Context) {
@@ -151,10 +151,7 @@ func doList(c *cli.Context) {
 		os.Exit(0)
 	}
 
-	fmt.Println(StatusHeader())
-	for _, eni := range enis {
-		fmt.Println(StatusRow(eni))
-	}
+	format.PrintENIs(os.Stdout, enis)
 }
 
 func doGrab(c *cli.Context) {
