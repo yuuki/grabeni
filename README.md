@@ -66,13 +66,22 @@ $ brew install grabeni
  $ go install github.com/yuuki1/grabeni
 ```
 
-### Release
+## Release
 
 ```bash
 $ vim ./version.go
 $ make cross
 $ ghr -u yuuki1 -p 2 $VERSION snapshot/
 ```
+
+## Roadmap
+
+- `attach`, `detach`, `grab`: Display prompt
+- `attach`, `detach`, `grab`: Show ENI information before execution
+- `attach`, `detach`, `grab`: Enrich log
+- `list`: Filter option
+- Add `check` command to check an availability zone
+- `attach`, `detach`, `grab`: dryrun option
 
 ## Contribution
 
