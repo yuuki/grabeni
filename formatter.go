@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/awslabs/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 func StatusHeader() string {
@@ -17,7 +17,7 @@ func StatusRow(eni *ec2.NetworkInterface) string {
 	if eni.Attachment == nil {
 		instanceID, deviceIndex = "", -1
 	} else {
-		instanceID = *eni.Attachment.InstanceID
+		instanceID = *eni.Attachment.InstanceId
 		deviceIndex = *eni.Attachment.DeviceIndex
 	}
 
@@ -36,9 +36,9 @@ func StatusRow(eni *ec2.NetworkInterface) string {
 	}
 
 	return fmt.Sprintf("%s\t\t%s\t%s\t%s\t%d\t\t%s\t%s",
-		*eni.NetworkInterfaceID,
-		*eni.PrivateDNSName,
-		*eni.PrivateIPAddress,
+		*eni.NetworkInterfaceId,
+		*eni.PrivateDnsName,
+		*eni.PrivateIpAddress,
 		instanceID,
 		deviceIndex,
 		*eni.Status,

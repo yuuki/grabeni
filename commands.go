@@ -120,16 +120,6 @@ OPTIONS:
 {{end}}`
 }
 
-func awsCli(c *cli.Context) *aws.Client {
-	client, err := aws.NewClient(
-		c.GlobalString("region"),
-		c.GlobalString("accesskey"),
-		c.GlobalString("secretkey"),
-	)
-	DieIf(err)
-	return client
-}
-
 func fetchInstanceIDIfEmpty(c *cli.Context) string {
 	if instanceID := c.String("instanceid"); instanceID != "" {
 		return instanceID
@@ -156,7 +146,7 @@ func doStatus(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	eni, err := awsCli(c).DescribeENIByID(eniID)
+	eni, err := aws.NewENIClient().DescribeENIByID(eniID)
 	DieIf(err)
 	if eni == nil {
 		os.Exit(0)
@@ -167,7 +157,7 @@ func doStatus(c *cli.Context) {
 }
 
 func doList(c *cli.Context) {
-	enis, err := awsCli(c).DescribeENIs()
+	enis, err := aws.NewENIClient().DescribeENIs()
 	DieIf(err)
 	if enis == nil {
 		os.Exit(0)
@@ -193,7 +183,7 @@ func doGrab(c *cli.Context) {
 
 	instanceID := fetchInstanceIDIfEmpty(c)
 
-	eni, err := awsCli(c).GrabENI(&aws.GrabENIParam{
+	eni, err := aws.NewENIClient().GrabENI(&aws.GrabENIParam{
 		InterfaceID: eniID,
 		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
@@ -224,7 +214,7 @@ func doAttach(c *cli.Context) {
 
 	instanceID := fetchInstanceIDIfEmpty(c)
 
-	eni, err := awsCli(c).AttachENIWithRetry(&aws.AttachENIParam{
+	eni, err := aws.NewENIClient().AttachENIWithRetry(&aws.AttachENIParam{
 		InterfaceID: eniID,
 		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
@@ -253,7 +243,7 @@ func doDetach(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	eni, err := awsCli(c).DetachENIWithRetry(&aws.DetachENIParam{
+	eni, err := aws.NewENIClient().DetachENIWithRetry(&aws.DetachENIParam{
 		InterfaceID: eniID,
 	}, &aws.RetryParam{
 		TimeoutSec:  int64(c.Int("timeout")),
