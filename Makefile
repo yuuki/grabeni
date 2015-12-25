@@ -6,7 +6,7 @@ test: testdeps
 	go test -v ./...
 
 build: deps
-	go build ./...
+	go build -o $(BIN) ./
 
 lint: deps testdeps
 	go vet
