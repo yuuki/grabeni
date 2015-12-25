@@ -8,12 +8,12 @@ grabeni
 [travis]: http://travis-ci.org/yuuki1/grabeni
 [godocs]: http://godoc.org/github.com/yuuki1/grabeni
 
-grabeni - ENI Grabbing tool from an other EC2 instance.
+`grabeni` is an operation-friendly tool to grab an EC2 Network Interface (ENI) from an other EC2 instance.
 
-Detaching and attaching (grabbing) ENI is a common way to realize VIP in EC2 with Heartbeat and Keepalived.
-`grabeni` provides command line interface for grabing ENI.
+Detaching and attaching (grabbing) ENI is a common way to realize VIP (Virtual IP address) in EC2 with Heartbeat, Keepalived, MHA, etc.
+`grabeni` provides command line interface for grabing ENI, supports timeout/retry for requesting AWS API.
 
-# Usage
+## Usage
 
 ```bash
 $ export AWS_ACCESS_KEY_ID='...'
@@ -22,7 +22,9 @@ $ export AWS_REGION='us-east-1'
 $ grabeni grab eni-xxxxxx --instanceid i-xxxxxxd # attach eni-xxxxxx to EC2 instance where grabeni runs if instanceid option is skipped
 ```
 
-# Example
+See also `granebi --help`.
+
+## Example
 
 ```bash
 $ grabeni list
@@ -39,21 +41,32 @@ $ grabeni grab eni-2222222
 grabbed: eni eni-2222222 attached to instance i-xxxxxx
 ```
 
-# Install
+## Installation
 
-## Linux
-
+### Homebrew
+```bash
+$ brew tap yuuki1/grabeni
+$ brew install grabeni
 ```
-# wget -O /usr/sbin/grabeni "https://github.com/yuuki1/grabeni/releases/download/$(curl -sI https://github.com/yuuki1/grabeni/releases/latest | awk -F'/' '/^Location:/{print $NF}' | tr -d '\r')/grabeni_linux_amd64" && chmod +x /usr/sbin/grabeni
+
+### Download binary from GitHub Releases
+[Releases・yuuki1/grabeni - GitHub](https://github.com/yuuki1/grabeni/releases)
+
+### Build from source
+```bash
+ $ go get github.com/yuuki1/grabeni
+ $ go install github.com/yuuki1/grabeni
 ```
 
-## OSX
+### Release
 
 ```bash
-$ wget -O /usr/local/bin/grabeni "https://github.com/yuuki1/grabeni/releases/download/$(curl -sI https://github.com/yuuki1/grabeni/releases/latest | awk -F'/' '/^Location:/{print $NF}' | tr -d '\r')/grabeni_linux_amd64" && chmod +x /usr/local/bin/grabeni
+$ vim ./version.go
+$ make cross
+$ ghr -u yuuki1 -p 2 $VERSION snapshot/
 ```
 
-# Contribution
+## Contribution
 
 1. Fork ([https://github.com/y_uuki/grabeni/fork](https://github.com/y_uuki/grabeni/fork))
 1. Create a feature branch
@@ -63,10 +76,10 @@ $ wget -O /usr/local/bin/grabeni "https://github.com/yuuki1/grabeni/releases/dow
 1. Run `gofmt -s`
 1. Create new Pull Request
 
-# License
+## License
 
 [The MIT License](./LICENSE).
 
-# Author
+## Author
 
-y_uuki <yuki.tsubo@gmail.com>
+[y_uuki](https://github.com/yuuki1)
