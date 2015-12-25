@@ -16,27 +16,3 @@ func debugf(format string, args ...interface{}) {
 	}
 }
 
-// ErrorIf outputs log if `err` occurs.
-func ErrorIf(err error) bool {
-	if err != nil {
-		Logf("error", err.Error())
-		return true
-	}
-
-	return false
-}
-
-// DieIf outputs log and exit(1) if `err` occurs.
-func DieIf(err error) {
-	if err != nil {
-		Logf("error", err.Error())
-		os.Exit(1)
-	}
-}
-
-// PanicIf raise panic if `err` occurs.
-func PanicIf(err error) {
-	if err != nil {
-		panic(err)
-	}
-}

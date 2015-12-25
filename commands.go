@@ -136,7 +136,10 @@ func doStatus(c *cli.Context) {
 	}
 
 	eni, err := aws.NewENIClient().DescribeENIByID(eniID)
-	DieIf(err)
+	if err != nil {
+		Logf("error", err.Error())
+		os.Exit(1)
+	}
 	if eni == nil {
 		os.Exit(0)
 	}
@@ -146,7 +149,10 @@ func doStatus(c *cli.Context) {
 
 func doList(c *cli.Context) {
 	enis, err := aws.NewENIClient().DescribeENIs()
-	DieIf(err)
+	if err != nil {
+		Logf("error", err.Error())
+		os.Exit(1)
+	}
 	if enis == nil {
 		os.Exit(0)
 	}
@@ -170,7 +176,10 @@ func doGrab(c *cli.Context) {
 	if instanceID = c.String("instanceid"); instanceID == "" {
 		var err error
 		instanceID, err = aws.NewMetaDataClient().GetInstanceID()
-		DieIf(err)
+		if err != nil {
+			Logf("error", err.Error())
+			os.Exit(1)
+		}
 	}
 
 	eni, err := aws.NewENIClient().GrabENI(&aws.GrabENIParam{
@@ -181,7 +190,10 @@ func doGrab(c *cli.Context) {
 		TimeoutSec:  int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
-	DieIf(err)
+	if err != nil {
+		Logf("error", err.Error())
+		os.Exit(1)
+	}
 	if eni == nil {
 		Logf("attached", "eni %s already attached to instance %s", eniID, instanceID)
 		os.Exit(0)
@@ -206,7 +218,10 @@ func doAttach(c *cli.Context) {
 	if instanceID = c.String("instanceid"); instanceID == "" {
 		var err error
 		instanceID, err = aws.NewMetaDataClient().GetInstanceID()
-		DieIf(err)
+		if err != nil {
+			Logf("error", err.Error())
+			os.Exit(1)
+		}
 	}
 
 	eni, err := aws.NewENIClient().AttachENIWithRetry(&aws.AttachENIParam{
@@ -217,7 +232,10 @@ func doAttach(c *cli.Context) {
 		TimeoutSec:  int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
-	DieIf(err)
+	if err != nil {
+		Logf("error", err.Error())
+		os.Exit(1)
+	}
 	if eni == nil {
 		Logf("attached", "eni %s already attached to instance %s", eniID, instanceID)
 		os.Exit(0)
@@ -244,7 +262,10 @@ func doDetach(c *cli.Context) {
 		TimeoutSec:  int64(c.Int("timeout")),
 		IntervalSec: int64(c.Int("interval")),
 	})
-	DieIf(err)
+	if err != nil {
+		Logf("error", err.Error())
+		os.Exit(1)
+	}
 	if eni == nil {
 		Logf("detached", "eni %s already detached", eniID)
 		os.Exit(0)
