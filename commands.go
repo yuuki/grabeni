@@ -8,6 +8,7 @@ import (
 	"github.com/codegangsta/cli"
 
 	"github.com/yuuki1/grabeni/aws"
+	"github.com/yuuki1/grabeni/format"
 	. "github.com/yuuki1/grabeni/log"
 )
 
@@ -20,9 +21,9 @@ var Commands = []cli.Command{
 }
 
 var commandStatus = cli.Command{
-	Name:  "status",
-	Aliases:  []string{"st"},
-	Usage: "Show ENI status",
+	Name:    "status",
+	Aliases: []string{"st"},
+	Usage:   "Show ENI status",
 	Description: `
     Show the information of the ENI identified with <eni-id>.
 `,
@@ -30,9 +31,9 @@ var commandStatus = cli.Command{
 }
 
 var commandList = cli.Command{
-	Name:  "list",
-	Aliases:  []string{"ls"},
-	Usage: "Show all ENIs",
+	Name:    "list",
+	Aliases: []string{"ls"},
+	Usage:   "Show all ENIs",
 	Description: `
     List the ENIs owned by your account.
 `,
@@ -140,8 +141,7 @@ func doStatus(c *cli.Context) {
 		os.Exit(0)
 	}
 
-	fmt.Println(StatusHeader())
-	fmt.Println(StatusRow(eni))
+	format.PrintENI(os.Stdout, eni)
 }
 
 func doList(c *cli.Context) {
@@ -151,10 +151,7 @@ func doList(c *cli.Context) {
 		os.Exit(0)
 	}
 
-	fmt.Println(StatusHeader())
-	for _, eni := range enis {
-		fmt.Println(StatusRow(eni))
-	}
+	format.PrintENIs(os.Stdout, enis)
 }
 
 func doGrab(c *cli.Context) {
