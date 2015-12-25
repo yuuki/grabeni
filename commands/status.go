@@ -15,7 +15,7 @@ var CommandStatus = cli.Command{
 	Name:    "status",
 	Aliases: []string{"st"},
 	Usage:   "Show ENI status",
-	Action: fatalOnError(doStatus),
+	Action:  fatalOnError(doStatus),
 }
 
 func doStatus(c *cli.Context) error {

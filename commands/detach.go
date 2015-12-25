@@ -11,8 +11,8 @@ import (
 
 var CommandArgDetach = "[--timeout TIMEOUT] [--interval INTERVAL] ENI_ID"
 var CommandDetach = cli.Command{
-	Name:  "detach",
-	Usage: "Detach ENI",
+	Name:   "detach",
+	Usage:  "Detach ENI",
 	Action: fatalOnError(doDetach),
 	Flags: []cli.Flag{
 		cli.IntFlag{Name: "t, timeout", Value: 10, Usage: "each attach and detach API request timeout seconds"},
@@ -46,4 +46,3 @@ func doDetach(c *cli.Context) error {
 
 	return nil
 }
-

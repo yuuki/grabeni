@@ -14,7 +14,7 @@ var CommandList = cli.Command{
 	Name:    "list",
 	Aliases: []string{"ls"},
 	Usage:   "List ENIs",
-	Action: fatalOnError(doList),
+	Action:  fatalOnError(doList),
 }
 
 func doList(c *cli.Context) error {

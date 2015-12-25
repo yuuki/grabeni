@@ -32,11 +32,11 @@ Run '{{.Name}} COMMAND --help' for more information on a command.
 `
 
 var commandArgs = map[string]string{
-	"status":   commands.CommandArgStatus,
+	"status": commands.CommandArgStatus,
 	"list":   commands.CommandArgList,
-	"attach":    commands.CommandArgAttach,
+	"attach": commands.CommandArgAttach,
 	"detach": commands.CommandArgDetach,
-	"grab":     commands.CommandArgGrab,
+	"grab":   commands.CommandArgGrab,
 }
 
 func setDebugOutputLevel() {

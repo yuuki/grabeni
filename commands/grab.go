@@ -11,8 +11,8 @@ import (
 
 var CommandArgGrab = "[--instanceid INSTANCE_ID] [--deviceindex DEVICE_INDEX] [--timeout TIMEOUT] [--interval INTERVAL] ENI_ID"
 var CommandGrab = cli.Command{
-	Name:  "grab",
-	Usage: "Detach and attach ENI whether the eni has already attached or not.",
+	Name:   "grab",
+	Usage:  "Detach and attach ENI whether the eni has already attached or not.",
 	Action: fatalOnError(doGrab),
 	Flags: []cli.Flag{
 		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "device index number"},

@@ -11,8 +11,8 @@ import (
 
 var CommandArgAttach = "[--instanceid INSTANCE_ID] [--deviceindex DEVICE_INDEX] [--timeout TIMEOUT] [--interval INTERVAL] ENI_ID"
 var CommandAttach = cli.Command{
-	Name:  "attach",
-	Usage: "Attach ENI",
+	Name:   "attach",
+	Usage:  "Attach ENI",
 	Action: fatalOnError(doAttach),
 	Flags: []cli.Flag{
 		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "device index number"},
