@@ -21,9 +21,9 @@ var Commands = []cli.Command{
 }
 
 var commandStatus = cli.Command{
-	Name:  "status",
-	Aliases:  []string{"st"},
-	Usage: "Show ENI status",
+	Name:    "status",
+	Aliases: []string{"st"},
+	Usage:   "Show ENI status",
 	Description: `
     Show the information of the ENI identified with <eni-id>.
 `,
@@ -31,9 +31,9 @@ var commandStatus = cli.Command{
 }
 
 var commandList = cli.Command{
-	Name:  "list",
-	Aliases:  []string{"ls"},
-	Usage: "Show all ENIs",
+	Name:    "list",
+	Aliases: []string{"ls"},
+	Usage:   "Show all ENIs",
 	Description: `
     List the ENIs owned by your account.
 `,

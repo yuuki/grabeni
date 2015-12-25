@@ -24,4 +24,3 @@ func (c *MetaDataClient) GetInstanceID() (string, error) {
 func (c *MetaDataClient) GetRegion() (string, error) {
 	return c.svc.Region()
 }
-
