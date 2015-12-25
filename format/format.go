@@ -23,17 +23,41 @@ func PrintENIs(w io.Writer, enis []*ec2.NetworkInterface) {
 	fmt.Fprintln(tw, header)
 
 	for _, eni := range enis {
+		var networkInterfaceId string
+		var privateDnsName string
+		var privateIpAddress string
 		var instanceID string
-		var deviceIndex int64
+		var deviceIndex int64 = -1
+		var name string
+		var status string
+
+		// avoid to occur panic bacause of invalid memory address or nil pointer dereference
+		if eni.NetworkInterfaceId != nil {
+			networkInterfaceId = *eni.NetworkInterfaceId
+		}
+		if eni.PrivateDnsName != nil {
+			privateDnsName = *eni.PrivateDnsName
+		}
+		if eni.PrivateIpAddress != nil {
+			privateIpAddress = *eni.PrivateIpAddress
+		}
+		if eni.Status != nil {
+			status = *eni.Status
+		}
 
 		if eni.Attachment == nil {
 			instanceID, deviceIndex = "", -1
 		} else {
-			instanceID = *eni.Attachment.InstanceId
-			deviceIndex = *eni.Attachment.DeviceIndex
+			// managed services such as Amazon RDS don't have InstanceId.
+			if eni.Attachment.InstanceId != nil {
+				instanceID = *eni.Attachment.InstanceId
+			}
+
+			if eni.Attachment.DeviceIndex != nil {
+				deviceIndex = *eni.Attachment.DeviceIndex
+			}
 		}
 
-		name := ""
 		if len(eni.TagSet) > 0 {
 			for _, tag := range eni.TagSet {
 				if *tag.Key == "Name" {
@@ -44,12 +68,12 @@ func PrintENIs(w io.Writer, enis []*ec2.NetworkInterface) {
 		}
 
 		fmt.Fprintln(tw, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%s\t%s",
-			*eni.NetworkInterfaceId,
-			*eni.PrivateDnsName,
-			*eni.PrivateIpAddress,
+			networkInterfaceId,
+			privateDnsName,
+			privateIpAddress,
 			instanceID,
 			deviceIndex,
-			*eni.Status,
+			status,
 			name,
 		))
 	}
