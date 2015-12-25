@@ -11,7 +11,15 @@ grabeni
 `grabeni` is an operation-friendly tool to grab an EC2 Network Interface (ENI) from an other EC2 instance.
 
 Detaching and attaching (grabbing) ENI is a common way to realize VIP (Virtual IP address) in EC2 with Heartbeat, Keepalived, MHA, etc.
-`grabeni` provides command line interface for grabing ENI, supports timeout/retry for requesting AWS API.
+`grabeni` provides command line interface for handling ENI.
+
+The list of `grabeni`'s features below.
+
+- Listing ENI information.
+- Attacing the specified ENI to the specified instance.
+- Detaching the specified ENI.
+- Grabbing (Attaching and Detaching) the specified ENI to the specified instance.
+- timeout/retry for requesting AWS API.
 
 ## Usage
 
