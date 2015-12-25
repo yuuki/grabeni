@@ -6,7 +6,7 @@ test: testdeps
 	go test -v ./...
 
 build: deps
-	go build -o $(BIN) ./
+	go build -o $(BIN) ./cmd
 
 lint: deps testdeps
 	go vet
@@ -22,7 +22,7 @@ cross: deps
 	cp -p $(PWD)/snapshot/windows_386/grabeni.exe $(PWD)/snapshot/grabeni_windows_386.exe
 
 deps:
-	go get -d -v .
+	go get -d -v ./...
 
 testdeps:
 	go get -d -v -t .
