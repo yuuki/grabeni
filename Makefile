@@ -1,18 +1,12 @@
 BIN = grabeni
 
-VERSION = $$(git describe --tags --always --dirty)
-
-BUILD_FLAGS = -ldflags "\
-	      -X main.Version=\"$(VERSION)\" \
-	      "
-
 all: clean cross test
 
 test: testdeps
 	go test -v ./...
 
 build: deps
-	go build $(BUILD_FLAGS) -o $(BIN) .
+	go build ./...
 
 lint: deps testdeps
 	go vet
@@ -34,7 +28,6 @@ testdeps:
 	go get -d -v -t .
 
 clean:
-	rm -fr build
 	go clean
 
 .PHONY: test build cross lint deps testdeps clean

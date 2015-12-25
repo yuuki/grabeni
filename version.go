@@ -1,4 +1,3 @@
 package main
 
-// `make build` sets this automaticaly
-var Version string
+var Version string = "0.2.0"
