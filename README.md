@@ -35,7 +35,7 @@ See also `granebi --help`.
 ## Example
 
 ```bash
-$ grabeni list
+$ grabeni ls
 NetworkInterfaceID	PrivateDNSName				PrivateIPAddress	InstanceID	DeviceIndex	Status	Name
 eni-0000000	  ip-10-0-0-100.ap-northeast-1.compute.internal	10.0.0.100	   0		in-use
 eni-1111111		ip-10-0-0-10.ap-northeast-1.compute.internal	10.0.0.10			-1		available	eni01
