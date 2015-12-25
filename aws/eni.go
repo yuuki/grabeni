@@ -55,11 +55,12 @@ func validateRetryParam(param *RetryParam) error {
 }
 
 func NewENIClient() *ENIClient {
+	session := session.New()
 	region := os.Getenv("AWS_REGION")
 	if region == "" {
-		region, _ = GetRegion()
+		region, _ = NewMetaDataClientFromSession(session).GetRegion()
 	}
-	svc := ec2.New(session.New(), &aws.Config{Region: aws.String(region)})
+	svc := ec2.New(session, &aws.Config{Region: aws.String(region)})
 	return &ENIClient{svc: svc}
 }
 

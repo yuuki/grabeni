@@ -120,20 +120,6 @@ OPTIONS:
 {{end}}`
 }
 
-func fetchInstanceIDIfEmpty(c *cli.Context) string {
-	if instanceID := c.String("instanceid"); instanceID != "" {
-		return instanceID
-	}
-
-	instanceID, err := aws.GetInstanceID()
-	if err != nil {
-		cli.ShowCommandHelp(c, c.Command.Name)
-		DieIf(err)
-	}
-
-	return instanceID
-}
-
 func doStatus(c *cli.Context) {
 	if len(c.Args()) < 1 {
 		cli.ShowCommandHelp(c, "status")
@@ -181,7 +167,12 @@ func doGrab(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	instanceID := fetchInstanceIDIfEmpty(c)
+	var instanceID string
+	if instanceID = c.String("instanceid"); instanceID == "" {
+		var err error
+		instanceID, err = aws.NewMetaDataClient().GetInstanceID()
+		DieIf(err)
+	}
 
 	eni, err := aws.NewENIClient().GrabENI(&aws.GrabENIParam{
 		InterfaceID: eniID,
@@ -212,7 +203,12 @@ func doAttach(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	instanceID := fetchInstanceIDIfEmpty(c)
+	var instanceID string
+	if instanceID = c.String("instanceid"); instanceID == "" {
+		var err error
+		instanceID, err = aws.NewMetaDataClient().GetInstanceID()
+		DieIf(err)
+	}
 
 	eni, err := aws.NewENIClient().AttachENIWithRetry(&aws.AttachENIParam{
 		InterfaceID: eniID,
