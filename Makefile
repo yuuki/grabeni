@@ -3,7 +3,7 @@ BIN = grabeni
 VERSION = $$(git describe --tags --always --dirty)
 
 BUILD_FLAGS = -ldflags "\
-	      -X main.Version \"$(VERSION)\" \
+	      -X main.Version=\"$(VERSION)\" \
 	      "
 
 all: clean cross test
