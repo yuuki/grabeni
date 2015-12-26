@@ -28,11 +28,11 @@ func doDetach(c *cli.Context) error {
 
 	eniID := c.Args().Get(0)
 
-	eni, err := aws.NewENIClient().DetachENIWithWaitUntil(&aws.DetachENIParam{
+	eni, err := aws.NewENIClient().DetachENIWithWaiter(&aws.DetachENIParam{
 		InterfaceID: eniID,
-	}, &aws.WaitUntilParam{
-		MaxAttempts:  c.Int("max-attempts"),
-		IntervalSec:  c.Int("interval"),
+	}, &aws.WaiterParam{
+		MaxAttempts: c.Int("max-attempts"),
+		IntervalSec: c.Int("interval"),
 	})
 	if err != nil {
 		return err

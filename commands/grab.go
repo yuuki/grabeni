@@ -43,8 +43,8 @@ func doGrab(c *cli.Context) error {
 		InterfaceID: eniID,
 		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
-	}, &aws.WaitUntilParam{
-		MaxAttempts:  c.Int("max-attempts"),
+	}, &aws.WaiterParam{
+		MaxAttempts: c.Int("max-attempts"),
 		IntervalSec: c.Int("interval"),
 	})
 	if err != nil {

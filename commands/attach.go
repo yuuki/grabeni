@@ -39,12 +39,12 @@ func doAttach(c *cli.Context) error {
 		}
 	}
 
-	eni, err := aws.NewENIClient().AttachENIWithWaitUntil(&aws.AttachENIParam{
+	eni, err := aws.NewENIClient().AttachENIWithWaiter(&aws.AttachENIParam{
 		InterfaceID: eniID,
 		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
-	}, &aws.WaitUntilParam{
-		MaxAttempts:  c.Int("max-attempts"),
+	}, &aws.WaiterParam{
+		MaxAttempts: c.Int("max-attempts"),
 		IntervalSec: c.Int("interval"),
 	})
 	if err != nil {
