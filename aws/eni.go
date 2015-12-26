@@ -2,6 +2,8 @@ package aws
 
 import (
 	"fmt"
+	"log"
+	"io"
 	"os"
 	"time"
 
@@ -13,6 +15,8 @@ import (
 
 type ENIClient struct {
 	svc ec2iface.EC2API
+	logger *log.Logger
+	logWriter io.Writer
 }
 
 type AttachENIParam struct {
@@ -54,7 +58,17 @@ func NewENIClient() *ENIClient {
 		region, _ = NewMetaDataClientFromSession(session).GetRegion()
 	}
 	svc := ec2.New(session, &aws.Config{Region: aws.String(region)})
-	return &ENIClient{svc: svc}
+
+	f, _ := os.Open(os.DevNull)
+	l := log.New(f, "", 0)
+
+	return &ENIClient{svc: svc, logger: l}
+}
+
+func (c *ENIClient) WithLogWriter(w io.Writer) *ENIClient {
+	c.logger.SetOutput(w)
+	c.logWriter = w
+	return c
 }
 
 func (c *ENIClient) DescribeENIByID(InterfaceID string) (*ec2.NetworkInterface, error) {
@@ -123,20 +137,26 @@ func (c *ENIClient) AttachENIWithWaiter(p *AttachENIParam, wp *WaiterParam) (*ec
 		return nil, err
 	}
 
+	c.logger.Printf("--> Attaching: %15s\n", p.InterfaceID)
+
 	// Wait until attach event completed or timeout
 	for i := 0; i < wp.MaxAttempts; i++ {
+		fmt.Fprint(c.logWriter, ".") // use fmt.Fprint because standard log package always newline
+
 		eni, err := c.DescribeENIByID(p.InterfaceID)
 		if err != nil {
 			return nil, err
 		}
 		if *eni.Status == "in-use" && eni.Attachment != nil && *eni.Attachment.Status == "attached" {
+			c.logger.Println()
+			c.logger.Printf("--> Attached: %15s\n", p.InterfaceID)
 			return eni, nil // detach completed
 		}
 
 		time.Sleep(time.Duration(wp.IntervalSec) * time.Second)
 	}
 
-	return nil, fmt.Errorf("over %d attachment attempts", wp.MaxAttempts)
+	return nil, fmt.Errorf("attach %s error: over %d polling attempts", p.InterfaceID, wp.MaxAttempts)
 }
 
 func (c *ENIClient) DetachENIByAttachmentID(attachmentID string) error {
@@ -179,20 +199,26 @@ func (c *ENIClient) DetachENIWithWaiter(p *DetachENIParam, wp *WaiterParam) (*ec
 		return nil, err
 	}
 
+	c.logger.Printf("--> Detaching: %15s\n", p.InterfaceID)
+
 	// Wait until detach event completed or timeout
 	for i := 0; i < wp.MaxAttempts; i++ {
+		fmt.Fprint(c.logWriter, ".") // use fmt.Fprint because standard log package always newline
+
 		eni, err := c.DescribeENIByID(p.InterfaceID)
 		if err != nil {
 			return nil, err
 		}
 		if *eni.Status == "available" {
+			c.logger.Println()
+			c.logger.Printf("--> Detached: %15s\n", p.InterfaceID)
 			return eni, nil // detach completed
 		}
 
 		time.Sleep(time.Duration(wp.IntervalSec) * time.Second)
 	}
 
-	return nil, fmt.Errorf("over %d detachment attempts", wp.MaxAttempts)
+	return nil, fmt.Errorf("detach %s error: over %d polling attempts", p.InterfaceID, wp.MaxAttempts)
 }
 
 func (c *ENIClient) GrabENI(p *GrabENIParam, wp *WaiterParam) (*ec2.NetworkInterface, error) {

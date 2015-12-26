@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"os"
 
 	"github.com/codegangsta/cli"
 
@@ -39,7 +40,7 @@ func doGrab(c *cli.Context) error {
 		}
 	}
 
-	eni, err := aws.NewENIClient().GrabENI(&aws.GrabENIParam{
+	eni, err := aws.NewENIClient().WithLogWriter(os.Stdout).GrabENI(&aws.GrabENIParam{
 		InterfaceID: eniID,
 		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
@@ -51,11 +52,11 @@ func doGrab(c *cli.Context) error {
 		return err
 	}
 	if eni == nil {
-		log.Infof("attached: eni %s already attached to instance %s", eniID, instanceID)
+		log.Infof("%s already attached to instance %s", eniID, instanceID)
 		return nil
 	}
 
-	log.Infof("grabbed: eni %s attached to instance %s", eniID, instanceID)
+	log.Infof("%s attached to instance %s", eniID, instanceID)
 
 	return nil
 }

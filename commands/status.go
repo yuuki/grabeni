@@ -26,7 +26,7 @@ func doStatus(c *cli.Context) error {
 
 	eniID := c.Args().Get(0)
 
-	eni, err := aws.NewENIClient().DescribeENIByID(eniID)
+	eni, err := aws.NewENIClient().WithLogWriter(os.Stdout).DescribeENIByID(eniID)
 	if err != nil {
 		return err
 	}
