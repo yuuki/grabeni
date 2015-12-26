@@ -246,3 +246,25 @@ func (c *ENIClient) GrabENI(p *GrabENIParam, wp *WaiterParam) (*ec2.NetworkInter
 
 	return eni, nil
 }
+
+func (c *ENIClient) DescribeInstanceByID(instanceID string) (*ec2.Instance, error) {
+	p := &ec2.DescribeInstancesInput{
+		InstanceIds: []*string{ aws.String(instanceID) },
+	}
+	resp, err := c.svc.DescribeInstances(p)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(resp.Reservations) < 1 {
+		return nil, nil // Not found
+	}
+
+	instances := resp.Reservations[0].Instances
+
+	if len(instances) < 1 {
+		return nil, nil // Not found
+	}
+
+	return instances[0], nil
+}
