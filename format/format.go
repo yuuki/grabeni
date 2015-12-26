@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
-const header = "ENI ID\tPrivate DNS Name\tPrivate IP\tInstance ID\tDevice index\tStatus\tName"
+const header = "ENI ID\tPrivate DNS Name\tPrivate IP\tInstance ID\tDevice index\tStatus\tName\tAZ"
 
 func PrintENI(w io.Writer, eni *ec2.NetworkInterface) {
 	enis := make([]*ec2.NetworkInterface, 1)
@@ -30,6 +30,7 @@ func PrintENIs(w io.Writer, enis []*ec2.NetworkInterface) {
 		var deviceIndex int64 = -1
 		var name string
 		var status string
+		var az string
 
 		// avoid to occur panic bacause of invalid memory address or nil pointer dereference
 		if eni.NetworkInterfaceId != nil {
@@ -43,6 +44,9 @@ func PrintENIs(w io.Writer, enis []*ec2.NetworkInterface) {
 		}
 		if eni.Status != nil {
 			status = *eni.Status
+		}
+		if eni.AvailabilityZone != nil {
+			az = *eni.AvailabilityZone
 		}
 
 		if eni.Attachment == nil {
@@ -67,7 +71,7 @@ func PrintENIs(w io.Writer, enis []*ec2.NetworkInterface) {
 			}
 		}
 
-		fmt.Fprintln(tw, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%s\t%s",
+		fmt.Fprintln(tw, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s",
 			networkInterfaceId,
 			privateDnsName,
 			privateIpAddress,
@@ -75,6 +79,7 @@ func PrintENIs(w io.Writer, enis []*ec2.NetworkInterface) {
 			deviceIndex,
 			status,
 			name,
+			az,
 		))
 	}
 
