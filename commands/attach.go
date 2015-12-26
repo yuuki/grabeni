@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/codegangsta/cli"
@@ -40,9 +41,20 @@ func doAttach(c *cli.Context) error {
 		}
 	}
 
-	eni, err := aws.NewENIClient().WithLogWriter(os.Stdout).AttachENIWithWaiter(&aws.AttachENIParam{
+	awscli := aws.NewENIClient().WithLogWriter(os.Stdout)
+
+	// Check instance id existence
+	instance, err := awscli.DescribeInstanceByID(instanceID)
+	if err != nil {
+		return err
+	}
+	if instance == nil {
+		return fmt.Errorf("No such instance %s", instanceID)
+	}
+
+	eni, err := awscli.AttachENIWithWaiter(&aws.AttachENIParam{
 		InterfaceID: eniID,
-		InstanceID:  instanceID,
+		InstanceID:  *instance.InstanceId,
 		DeviceIndex: c.Int("deviceindex"),
 	}, &aws.WaiterParam{
 		MaxAttempts: c.Int("max-attempts"),
