@@ -43,9 +43,9 @@ func doGrab(c *cli.Context) error {
 		InterfaceID: eniID,
 		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
-	}, &aws.RetryParam{
-		TimeoutSec:  int64(c.Int("timeout")),
-		IntervalSec: int64(c.Int("interval")),
+	}, &aws.WaitUntilParam{
+		MaxAttempts:  c.Int("max-attempts"),
+		IntervalSec: c.Int("interval"),
 	})
 	if err != nil {
 		return err
