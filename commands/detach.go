@@ -15,7 +15,7 @@ var CommandDetach = cli.Command{
 	Usage:  "Detach ENI",
 	Action: fatalOnError(doDetach),
 	Flags: []cli.Flag{
-		cli.IntFlag{Name: "n, max-attempts", Value: 5, Usage: "the maximum number of attempts to poll the change of ENI status (default: 5)"},
+		cli.IntFlag{Name: "n, max-attempts", Value: 10, Usage: "the maximum number of attempts to poll the change of ENI status (default: 10)"},
 		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "the interval in seconds to poll the change of ENI status (default: 2)"},
 	},
 }
