@@ -9,7 +9,7 @@ import (
 	"github.com/yuuki1/grabeni/log"
 )
 
-var CommandArgGrab = "[--instanceid INSTANCE_ID] [--deviceindex DEVICE_INDEX] [--timeout TIMEOUT] [--interval INTERVAL] ENI_ID"
+var CommandArgGrab = "[--instanceid INSTANCE_ID] [--deviceindex DEVICE_INDEX] [--max-attempts MAX_ATTEMPTS] [--interval INTERVAL] ENI_ID"
 var CommandGrab = cli.Command{
 	Name:   "grab",
 	Usage:  "Detach and attach ENI whether the eni has already attached or not.",
@@ -17,8 +17,8 @@ var CommandGrab = cli.Command{
 	Flags: []cli.Flag{
 		cli.IntFlag{Name: "d, deviceindex", Value: 1, Usage: "device index number"},
 		cli.StringFlag{Name: "I, instanceid", Usage: "attach-targeted instance id"},
-		cli.IntFlag{Name: "t, timeout", Value: 10, Usage: "each attach and detach API request timeout seconds"},
-		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "each attach and detach API request polling interval seconds"},
+		cli.IntFlag{Name: "n, max-attempts", Value: 10, Usage: "the maximum number of attempts to poll the change of ENI status (default: 10)"},
+		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "the interval in seconds to poll the change of ENI status (default: 2)"},
 	},
 }
 
@@ -43,9 +43,9 @@ func doGrab(c *cli.Context) error {
 		InterfaceID: eniID,
 		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
-	}, &aws.RetryParam{
-		TimeoutSec:  int64(c.Int("timeout")),
-		IntervalSec: int64(c.Int("interval")),
+	}, &aws.WaiterParam{
+		MaxAttempts: c.Int("max-attempts"),
+		IntervalSec: c.Int("interval"),
 	})
 	if err != nil {
 		return err

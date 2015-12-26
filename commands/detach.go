@@ -9,14 +9,14 @@ import (
 	"github.com/yuuki1/grabeni/log"
 )
 
-var CommandArgDetach = "[--timeout TIMEOUT] [--interval INTERVAL] ENI_ID"
+var CommandArgDetach = "[--max-attempts MAX_ATTEMPTS] [--interval INTERVAL] ENI_ID"
 var CommandDetach = cli.Command{
 	Name:   "detach",
 	Usage:  "Detach ENI",
 	Action: fatalOnError(doDetach),
 	Flags: []cli.Flag{
-		cli.IntFlag{Name: "t, timeout", Value: 10, Usage: "each attach and detach API request timeout seconds"},
-		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "each attach and detach API request polling interval seconds"},
+		cli.IntFlag{Name: "n, max-attempts", Value: 10, Usage: "the maximum number of attempts to poll the change of ENI status (default: 10)"},
+		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "the interval in seconds to poll the change of ENI status (default: 2)"},
 	},
 }
 
@@ -28,11 +28,11 @@ func doDetach(c *cli.Context) error {
 
 	eniID := c.Args().Get(0)
 
-	eni, err := aws.NewENIClient().DetachENIWithRetry(&aws.DetachENIParam{
+	eni, err := aws.NewENIClient().DetachENIWithWaiter(&aws.DetachENIParam{
 		InterfaceID: eniID,
-	}, &aws.RetryParam{
-		TimeoutSec:  int64(c.Int("timeout")),
-		IntervalSec: int64(c.Int("interval")),
+	}, &aws.WaiterParam{
+		MaxAttempts: c.Int("max-attempts"),
+		IntervalSec: c.Int("interval"),
 	})
 	if err != nil {
 		return err

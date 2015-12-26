@@ -27,28 +27,21 @@ type DetachENIParam struct {
 
 type GrabENIParam AttachENIParam
 
-type RetryParam struct {
-	TimeoutSec  int64
-	IntervalSec int64
+type WaiterParam struct {
+	MaxAttempts int
+	IntervalSec int
 }
 
-func validateRetryParam(param *RetryParam) error {
-	if param == nil {
-		return fmt.Errorf("RetryParam require")
+func validateWaitUntilParam(p *WaiterParam) error {
+	if p == nil {
+		return fmt.Errorf("WaitUntilParam require")
 	}
 
-	if param.TimeoutSec <= 0 {
-		return fmt.Errorf("invalid timeout (%d) seconds", param.TimeoutSec)
+	if p.MaxAttempts <= 0 {
+		return fmt.Errorf("invalid max attempts (%d)", p.MaxAttempts)
 	}
-	if param.IntervalSec <= 0 {
-		return fmt.Errorf("invalid interval (%d) seconds", param.IntervalSec)
-	}
-	if param.TimeoutSec < param.IntervalSec {
-		return fmt.Errorf(
-			"interval (%d) should be less than timeout (%d) seconds",
-			param.IntervalSec,
-			param.TimeoutSec,
-		)
+	if p.IntervalSec <= 0 {
+		return fmt.Errorf("invalid interval (%d) seconds", p.IntervalSec)
 	}
 
 	return nil
@@ -121,32 +114,29 @@ func (c *ENIClient) AttachENI(param *AttachENIParam) (*ec2.NetworkInterface, err
 	return eni, nil
 }
 
-func (c *ENIClient) AttachENIWithRetry(param *AttachENIParam, retryParam *RetryParam) (*ec2.NetworkInterface, error) {
-	if err := validateRetryParam(retryParam); err != nil {
+func (c *ENIClient) AttachENIWithWaiter(p *AttachENIParam, wp *WaiterParam) (*ec2.NetworkInterface, error) {
+	if err := validateWaitUntilParam(wp); err != nil {
 		return nil, err
 	}
 
-	if eni, err := c.AttachENI(param); eni == nil || err != nil {
+	if eni, err := c.AttachENI(p); eni == nil || err != nil {
 		return nil, err
 	}
 
-	// Retry until attach event completed or timeout
-	for {
-		select {
-		case <-time.After(time.Duration(retryParam.TimeoutSec) * time.Second):
-			return nil, fmt.Errorf("timeout occured. %d seconds elapsed.", retryParam.TimeoutSec)
-		case <-time.Tick(time.Duration(retryParam.IntervalSec) * time.Second):
-			eni, err := c.DescribeENIByID(param.InterfaceID)
-			if err != nil {
-				return nil, err
-			}
-			if *eni.Status == "in-use" && eni.Attachment != nil && *eni.Attachment.Status == "attached" {
-				return eni, nil // detach completed
-			}
+	// Wait until attach event completed or timeout
+	for i := 0; i < wp.MaxAttempts; i++ {
+		eni, err := c.DescribeENIByID(p.InterfaceID)
+		if err != nil {
+			return nil, err
 		}
+		if *eni.Status == "in-use" && eni.Attachment != nil && *eni.Attachment.Status == "attached" {
+			return eni, nil // detach completed
+		}
+
+		time.Sleep(time.Duration(wp.IntervalSec) * time.Second)
 	}
 
-	return nil, nil
+	return nil, fmt.Errorf("over %d attachment attempts", wp.MaxAttempts)
 }
 
 func (c *ENIClient) DetachENIByAttachmentID(attachmentID string) error {
@@ -180,36 +170,33 @@ func (c *ENIClient) DetachENI(param *DetachENIParam) (*ec2.NetworkInterface, err
 	return eni, nil
 }
 
-func (c *ENIClient) DetachENIWithRetry(param *DetachENIParam, retryParam *RetryParam) (*ec2.NetworkInterface, error) {
-	if err := validateRetryParam(retryParam); err != nil {
+func (c *ENIClient) DetachENIWithWaiter(p *DetachENIParam, wp *WaiterParam) (*ec2.NetworkInterface, error) {
+	if err := validateWaitUntilParam(wp); err != nil {
 		return nil, err
 	}
 
-	if eni, err := c.DetachENI(param); eni == nil || err != nil {
+	if eni, err := c.DetachENI(p); eni == nil || err != nil {
 		return nil, err
 	}
 
-	// Retry until detach event completed or timeout
-	for {
-		select {
-		case <-time.After(time.Duration(retryParam.TimeoutSec) * time.Second):
-			return nil, fmt.Errorf("timeout occured. %d seconds elapsed.", retryParam.TimeoutSec)
-		case <-time.Tick(time.Duration(retryParam.IntervalSec) * time.Second):
-			eni, err := c.DescribeENIByID(param.InterfaceID)
-			if err != nil {
-				return nil, err
-			}
-			if *eni.Status == "available" {
-				return eni, nil // detach completed
-			}
+	// Wait until detach event completed or timeout
+	for i := 0; i < wp.MaxAttempts; i++ {
+		eni, err := c.DescribeENIByID(p.InterfaceID)
+		if err != nil {
+			return nil, err
 		}
+		if *eni.Status == "available" {
+			return eni, nil // detach completed
+		}
+
+		time.Sleep(time.Duration(wp.IntervalSec) * time.Second)
 	}
 
-	return nil, nil
+	return nil, fmt.Errorf("over %d detachment attempts", wp.MaxAttempts)
 }
 
-func (c *ENIClient) GrabENI(param *GrabENIParam, retryParam *RetryParam) (*ec2.NetworkInterface, error) {
-	eni, err := c.DescribeENIByID(param.InterfaceID)
+func (c *ENIClient) GrabENI(p *GrabENIParam, wp *WaiterParam) (*ec2.NetworkInterface, error) {
+	eni, err := c.DescribeENIByID(p.InterfaceID)
 	if err != nil {
 		return nil, err
 	}
@@ -217,17 +204,17 @@ func (c *ENIClient) GrabENI(param *GrabENIParam, retryParam *RetryParam) (*ec2.N
 	// Skip detaching if the target ENI has still not attached with the other instance
 	if *eni.Status == "in-use" && eni.Attachment != nil && *eni.Attachment.Status == "attached" {
 		// Do nothing if the target ENI already attached with the target instance
-		if *eni.Attachment.InstanceId == param.InstanceID {
+		if *eni.Attachment.InstanceId == p.InstanceID {
 			return nil, nil
 		}
 
-		if _, err := c.DetachENIWithRetry(&DetachENIParam{InterfaceID: param.InterfaceID}, retryParam); err != nil {
+		if _, err := c.DetachENIWithWaiter(&DetachENIParam{InterfaceID: p.InterfaceID}, wp); err != nil {
 			return nil, err
 		}
 	}
 
-	p := AttachENIParam(*param)
-	if eni, err = c.AttachENIWithRetry(&p, retryParam); err != nil {
+	param := AttachENIParam(*p)
+	if eni, err = c.AttachENIWithWaiter(&param, wp); err != nil {
 		return nil, err
 	}
 
