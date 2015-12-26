@@ -98,13 +98,12 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Logf("error", err.Error())
+		log.Error(err.Error())
 	}
 }
 
 func cmdNotFound(c *cli.Context, command string) {
-	log.Logf(
-		"",
+	log.Infof(
 		"%s: '%s' is not a %s command. See '%s --help'.",
 		c.App.Name,
 		command,

@@ -6,7 +6,7 @@ import (
 	"github.com/codegangsta/cli"
 
 	"github.com/yuuki1/grabeni/aws"
-	. "github.com/yuuki1/grabeni/log"
+	"github.com/yuuki1/grabeni/log"
 )
 
 var CommandArgGrab = "[--instanceid INSTANCE_ID] [--deviceindex DEVICE_INDEX] [--timeout TIMEOUT] [--interval INTERVAL] ENI_ID"
@@ -51,11 +51,11 @@ func doGrab(c *cli.Context) error {
 		return err
 	}
 	if eni == nil {
-		Logf("attached", "eni %s already attached to instance %s", eniID, instanceID)
+		log.Infof("attached: eni %s already attached to instance %s", eniID, instanceID)
 		return nil
 	}
 
-	Logf("grabbed", "eni %s attached to instance %s", eniID, instanceID)
+	log.Infof("grabbed: eni %s attached to instance %s", eniID, instanceID)
 
 	return nil
 }

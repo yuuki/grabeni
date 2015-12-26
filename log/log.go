@@ -1,20 +1,39 @@
 package log
 
 import (
-	"fmt"
-	"os"
+	"log"
 )
 
 var IsDebug = false
 
-// Log outputs `format` with `prefix`
-func Logf(prefix, format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, prefix+": "+format+"\n", args...)
+func init() {
+	log.SetFlags(0)
 }
 
-func Debugf(format string, args ...interface{}) {
+func Debug(v ...interface{}) {
 	if IsDebug == true {
-		Logf("debug", format, args...)
+		log.Println(v...)
 	}
 }
 
+func Debugf(format string, v ...interface{}) {
+	if IsDebug == true {
+		log.Printf(format, v...)
+	}
+}
+
+func Info(v ...interface{}) {
+	log.Println(v...)
+}
+
+func Infof(format string, v ...interface{}) {
+	log.Printf(format, v...)
+}
+
+func Error(v ...interface{}) {
+	log.Fatal(v...)
+}
+
+func Errorf(format string, v ...interface{}) {
+	log.Fatalf(format, v...)
+}

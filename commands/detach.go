@@ -6,7 +6,7 @@ import (
 	"github.com/codegangsta/cli"
 
 	"github.com/yuuki1/grabeni/aws"
-	. "github.com/yuuki1/grabeni/log"
+	"github.com/yuuki1/grabeni/log"
 )
 
 var CommandArgDetach = "[--timeout TIMEOUT] [--interval INTERVAL] ENI_ID"
@@ -38,11 +38,11 @@ func doDetach(c *cli.Context) error {
 		return err
 	}
 	if eni == nil {
-		Logf("detached", "eni %s already detached", eniID)
+		log.Infof("detached: eni %s already detached", eniID)
 		return nil
 	}
 
-	Logf("detached", "eni %s detached", eniID)
+	log.Infof("detached: eni %s detached", eniID)
 
 	return nil
 }
