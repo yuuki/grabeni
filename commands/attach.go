@@ -9,7 +9,7 @@ import (
 	"github.com/yuuki1/grabeni/log"
 )
 
-var CommandArgAttach = "[--instanceid INSTANCE_ID] [--deviceindex DEVICE_INDEX] [--timeout TIMEOUT] [--interval INTERVAL] ENI_ID"
+var CommandArgAttach = "[--instanceid INSTANCE_ID] [--deviceindex DEVICE_INDEX] [--max-attempts MAX_ATTEMPTS] [--interval INTERVAL] ENI_ID"
 var CommandAttach = cli.Command{
 	Name:   "attach",
 	Usage:  "Attach ENI",
