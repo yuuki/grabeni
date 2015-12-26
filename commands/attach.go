@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"os"
 
 	"github.com/codegangsta/cli"
 
@@ -39,7 +40,7 @@ func doAttach(c *cli.Context) error {
 		}
 	}
 
-	eni, err := aws.NewENIClient().AttachENIWithWaiter(&aws.AttachENIParam{
+	eni, err := aws.NewENIClient().WithLogWriter(os.Stdout).AttachENIWithWaiter(&aws.AttachENIParam{
 		InterfaceID: eniID,
 		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
@@ -51,11 +52,11 @@ func doAttach(c *cli.Context) error {
 		return err
 	}
 	if eni == nil {
-		log.Infof("attached: eni %s already attached to instance %s", eniID, instanceID)
+		log.Infof("%s already attached to instance %s", eniID, instanceID)
 		return nil
 	}
 
-	log.Infof("attached: eni %s attached to instance %s", eniID, instanceID)
+	log.Infof("%s attached to instance %s", eniID, instanceID)
 
 	return nil
 }

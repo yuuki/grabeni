@@ -18,7 +18,7 @@ var CommandList = cli.Command{
 }
 
 func doList(c *cli.Context) error {
-	enis, err := aws.NewENIClient().DescribeENIs()
+	enis, err := aws.NewENIClient().WithLogWriter(os.Stdout).DescribeENIs()
 	if err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"os"
 
 	"github.com/codegangsta/cli"
 
@@ -28,7 +29,7 @@ func doDetach(c *cli.Context) error {
 
 	eniID := c.Args().Get(0)
 
-	eni, err := aws.NewENIClient().DetachENIWithWaiter(&aws.DetachENIParam{
+	eni, err := aws.NewENIClient().WithLogWriter(os.Stdout).DetachENIWithWaiter(&aws.DetachENIParam{
 		InterfaceID: eniID,
 	}, &aws.WaiterParam{
 		MaxAttempts: c.Int("max-attempts"),
@@ -38,11 +39,11 @@ func doDetach(c *cli.Context) error {
 		return err
 	}
 	if eni == nil {
-		log.Infof("detached: eni %s already detached", eniID)
+		log.Infof("%s already detached", eniID)
 		return nil
 	}
 
-	log.Infof("detached: eni %s detached", eniID)
+	log.Infof("%s detached", eniID)
 
 	return nil
 }

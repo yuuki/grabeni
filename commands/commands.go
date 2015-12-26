@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/codegangsta/cli"
 
 	"github.com/yuuki1/grabeni/log"
@@ -17,7 +19,7 @@ var Commands = []cli.Command{
 func fatalOnError(command func(context *cli.Context) error) func(context *cli.Context) {
 	return func(context *cli.Context) {
 		if err := command(context); err != nil {
-			log.Error(err.Error())
+			log.Error(fmt.Sprintf("error: %s", err.Error()))
 		}
 	}
 }
