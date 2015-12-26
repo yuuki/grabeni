@@ -25,7 +25,7 @@ deps:
 	go get -d -v ./...
 
 testdeps:
-	go get -d -v -t .
+	go get -d -v -t ./...
 
 clean:
 	go clean
