@@ -36,17 +36,18 @@ See also `granebi --help`.
 
 ```bash
 $ grabeni ls
-ID            NAME	  STATUS		  PRIVATE DNS NAME				                      PRIVATE IP	AZ		  DEVICE INDEX	INSTANCE ID	INSTANCE NAME
-eni-00000000	eni01   in-use      ip-10-0-0-100.ap-northeast-1.compute.internal	10.0.0.100	ap-northeast-1b   0		i-00000000  instance01
-eni-11111111	eni02   available   ip-10-0-0-10.ap-northeast-1.compute.internal	10.0.0.10		ap-northeast-1c	 -1
-eni-22222222	eni03   avaolable   ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11	  ap-northeast-1c   1
+ID            NAME    STATUS      PRIVATE DNS NAME                              PRIVATE IP  AZ              DEVICE INDEX    INSTANCE ID INSTANCE NAME
+eni-00000000  eni01   in-use      ip-10-0-0-100.ap-northeast-1.compute.internal 10.0.0.100  ap-northeast-1b 0   i-00000000  instance01
+eni-11111111  eni02   available   ip-10-0-0-10.ap-northeast-1.compute.internal	10.0.0.10   ap-northeast-1c -1
+eni-22222222  eni03   avaolable   ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11   ap-northeast-1c 1
 
 $ grabeni status eni-2222222
-NetworkInterfaceID	PrivateDNSName				PrivateIPAddress	InstanceID	DeviceIndex	Status	Name
-ID            NAME	  STATUS		  PRIVATE DNS NAME				                      PRIVATE IP	AZ		  DEVICE INDEX	INSTANCE ID	INSTANCE NAME
-eni-22222222	eni03   avaolable   ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11	  ap-northeast-1c   1
+ID            NAME    STATUS      PRIVATE DNS NAME                              PRIVATE IP  AZ              DEVICE INDEX    INSTANCE ID INSTANCE NAME
+eni-22222222  eni03   avaolable   ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11   ap-northeast-1c 1
 
 $ grabeni grab eni-2222222
+--> Detaching:    eni-2222222
+--> Attaching:    eni-2222222
 eni eni-2222222 attached to instance i-xxxxxx
 ```
 
