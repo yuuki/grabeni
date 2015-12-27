@@ -65,7 +65,7 @@ $ brew install grabeni
 ### Build from source
 ```bash
  $ go get github.com/yuuki1/grabeni
- $ go install github.com/yuuki1/grabeni
+ $ go install github.com/yuuki1/grabeni/...
 ```
 
 ## Release
