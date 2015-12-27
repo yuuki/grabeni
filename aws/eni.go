@@ -11,6 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+
+	"github.com/yuuki1/grabeni/aws/model"
 )
 
 type ENIClient struct {
@@ -71,7 +73,7 @@ func (c *ENIClient) WithLogWriter(w io.Writer) *ENIClient {
 	return c
 }
 
-func (c *ENIClient) DescribeENIByID(InterfaceID string) (*ec2.NetworkInterface, error) {
+func (c *ENIClient) DescribeENIByID(InterfaceID string) (*model.ENI, error) {
 	params := &ec2.DescribeNetworkInterfacesInput{
 		NetworkInterfaceIds: []*string{
 			aws.String(InterfaceID),
@@ -86,10 +88,17 @@ func (c *ENIClient) DescribeENIByID(InterfaceID string) (*ec2.NetworkInterface, 
 		return nil, nil
 	}
 
-	return resp.NetworkInterfaces[0], nil
+	eni := model.NewENI(resp.NetworkInterfaces[0])
+	instance, err := c.DescribeInstanceByID(eni.AttachedInstanceID())
+	if err != nil {
+		return nil, err
+	}
+	eni.SetInstance(instance)
+
+	return eni, nil
 }
 
-func (c *ENIClient) DescribeENIs() ([]*ec2.NetworkInterface, error) {
+func (c *ENIClient) DescribeENIs() ([]*model.ENI, error) {
 	resp, err := c.svc.DescribeNetworkInterfaces(nil)
 	if err != nil {
 		return nil, err
@@ -99,20 +108,44 @@ func (c *ENIClient) DescribeENIs() ([]*ec2.NetworkInterface, error) {
 		return nil, nil
 	}
 
-	return resp.NetworkInterfaces, nil
+	enis := make([]*model.ENI, 0)
+	for _, iface := range resp.NetworkInterfaces {
+		enis = append(enis, model.NewENI(iface))
+	}
+
+	instanceIDs := make([]string, 0)
+	for _, eni := range enis {
+		if id := eni.AttachedInstanceID(); id != "" {
+			instanceIDs = append(instanceIDs, id)
+		}
+	}
+
+	instances, err := c.DescribeInstancesByIDs(instanceIDs)
+	if err != nil {
+		return nil, err
+	}
+	//TODO make hashmap
+
+	for _, eni := range enis {
+		for _, instance := range instances {
+			if eni.AttachedInstanceID() == instance.InstanceID() {
+				eni.SetInstance(instance)
+			}
+		}
+	}
+
+	return enis, nil
 }
 
-func (c *ENIClient) AttachENI(param *AttachENIParam) (*ec2.NetworkInterface, error) {
+func (c *ENIClient) AttachENI(param *AttachENIParam) (*model.ENI, error) {
 	eni, err := c.DescribeENIByID(param.InterfaceID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Do nothing if the target ENI already attached with the target instance
-	if eni.Attachment != nil {
-		if *eni.Attachment.InstanceId == param.InstanceID {
-			return nil, nil
-		}
+	if eni.AttachedInstanceID() == param.InstanceID {
+		return nil, nil
 	}
 
 	input := &ec2.AttachNetworkInterfaceInput{
@@ -128,7 +161,7 @@ func (c *ENIClient) AttachENI(param *AttachENIParam) (*ec2.NetworkInterface, err
 	return eni, nil
 }
 
-func (c *ENIClient) AttachENIWithWaiter(p *AttachENIParam, wp *WaiterParam) (*ec2.NetworkInterface, error) {
+func (c *ENIClient) AttachENIWithWaiter(p *AttachENIParam, wp *WaiterParam) (*model.ENI, error) {
 	if err := validateWaitUntilParam(wp); err != nil {
 		return nil, err
 	}
@@ -147,7 +180,7 @@ func (c *ENIClient) AttachENIWithWaiter(p *AttachENIParam, wp *WaiterParam) (*ec
 		if err != nil {
 			return nil, err
 		}
-		if *eni.Status == "in-use" && eni.Attachment != nil && *eni.Attachment.Status == "attached" {
+		if eni.Status() == "in-use" && eni.AttachedStatus() == "attached" {
 			c.logger.Println()
 			c.logger.Printf("--> Attached: %15s\n", p.InterfaceID)
 			return eni, nil // detach completed
@@ -172,25 +205,25 @@ func (c *ENIClient) DetachENIByAttachmentID(attachmentID string) error {
 	return nil
 }
 
-func (c *ENIClient) DetachENI(param *DetachENIParam) (*ec2.NetworkInterface, error) {
+func (c *ENIClient) DetachENI(param *DetachENIParam) (*model.ENI, error) {
 	eni, err := c.DescribeENIByID(param.InterfaceID)
 	if err != nil {
 		return nil, err
 	}
 
-	if *eni.Status == "available" {
+	if eni.Status() == "available" {
 		// already detached
 		return nil, nil
 	}
 
-	if err := c.DetachENIByAttachmentID(*eni.Attachment.AttachmentId); err != nil {
+	if err := c.DetachENIByAttachmentID(eni.AttachmentID()); err != nil {
 		return nil, err
 	}
 
 	return eni, nil
 }
 
-func (c *ENIClient) DetachENIWithWaiter(p *DetachENIParam, wp *WaiterParam) (*ec2.NetworkInterface, error) {
+func (c *ENIClient) DetachENIWithWaiter(p *DetachENIParam, wp *WaiterParam) (*model.ENI, error) {
 	if err := validateWaitUntilParam(wp); err != nil {
 		return nil, err
 	}
@@ -209,9 +242,9 @@ func (c *ENIClient) DetachENIWithWaiter(p *DetachENIParam, wp *WaiterParam) (*ec
 		if err != nil {
 			return nil, err
 		}
-		if *eni.Status == "available" {
+		if eni.Status() == "available" {
 			c.logger.Println()
-			c.logger.Printf("--> Detached: %15s\n", p.InterfaceID)
+			c.logger.Printf("--> Detached: %15s\n", eni.InterfaceID())
 			return eni, nil // detach completed
 		}
 
@@ -221,20 +254,20 @@ func (c *ENIClient) DetachENIWithWaiter(p *DetachENIParam, wp *WaiterParam) (*ec
 	return nil, fmt.Errorf("detach %s error: over %d polling attempts", p.InterfaceID, wp.MaxAttempts)
 }
 
-func (c *ENIClient) GrabENI(p *GrabENIParam, wp *WaiterParam) (*ec2.NetworkInterface, error) {
+func (c *ENIClient) GrabENI(p *GrabENIParam, wp *WaiterParam) (*model.ENI, error) {
 	eni, err := c.DescribeENIByID(p.InterfaceID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Skip detaching if the target ENI has still not attached with the other instance
-	if *eni.Status == "in-use" && eni.Attachment != nil && *eni.Attachment.Status == "attached" {
+	if eni.Status() == "in-use" && eni.AttachedStatus() == "attached" {
 		// Do nothing if the target ENI already attached with the target instance
-		if *eni.Attachment.InstanceId == p.InstanceID {
+		if eni.AttachedInstanceID() == p.InstanceID {
 			return nil, nil
 		}
 
-		if _, err := c.DetachENIWithWaiter(&DetachENIParam{InterfaceID: p.InterfaceID}, wp); err != nil {
+		if _, err := c.DetachENIWithWaiter(&DetachENIParam{InterfaceID: eni.InterfaceID()}, wp); err != nil {
 			return nil, err
 		}
 	}
@@ -247,9 +280,10 @@ func (c *ENIClient) GrabENI(p *GrabENIParam, wp *WaiterParam) (*ec2.NetworkInter
 	return eni, nil
 }
 
-func (c *ENIClient) DescribeInstanceByID(instanceID string) (*ec2.Instance, error) {
+func (c *ENIClient) DescribeInstanceByID(instanceID string) (*model.Instance, error) {
 	p := &ec2.DescribeInstancesInput{
 		InstanceIds: []*string{ aws.String(instanceID) },
+		MaxResults: aws.Int64(1),
 	}
 	resp, err := c.svc.DescribeInstances(p)
 	if err != nil {
@@ -266,5 +300,28 @@ func (c *ENIClient) DescribeInstanceByID(instanceID string) (*ec2.Instance, erro
 		return nil, nil // Not found
 	}
 
-	return instances[0], nil
+	return model.NewInstance(instances[0]), nil
+}
+
+func (c *ENIClient) DescribeInstancesByIDs(instanceIDs []string) ([]*model.Instance, error) {
+	p := &ec2.DescribeInstancesInput{
+		InstanceIds: aws.StringSlice(instanceIDs),
+	}
+	resp, err := c.svc.DescribeInstances(p)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(resp.Reservations) < 1 {
+		return nil, nil // Not found
+	}
+
+	instances := make([]*model.Instance, 1)
+	for _, r := range resp.Reservations {
+		for _, i := range r.Instances {
+			instances = append(instances, model.NewInstance(i))
+		}
+	}
+
+	return instances, nil
 }

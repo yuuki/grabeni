@@ -7,7 +7,8 @@ import (
 type Instance ec2.Instance
 
 func NewInstance(i *ec2.Instance) *Instance {
-	return &Instance(*i)
+	instance := Instance(*i)
+	return &instance
 }
 
 func (i *Instance) InstanceID() string {
@@ -15,8 +16,8 @@ func (i *Instance) InstanceID() string {
 }
 
 func (i *Instance) Name() string {
-	if len(e.Tags) > 0 {
-		for _, tag := range e.Tags {
+	if len(i.Tags) > 0 {
+		for _, tag := range i.Tags {
 			if *tag.Key == "Name" {
 				return *tag.Value
 			}
