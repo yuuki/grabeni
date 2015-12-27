@@ -8,7 +8,7 @@ import (
 	"github.com/yuuki1/grabeni/aws/model"
 )
 
-const header = "ENI ID\tPrivate DNS Name\tPrivate IP\tInstance ID\tInsrance Name\tDevice index\tStatus\tName\tAZ"
+const header = "ID\tNAME\tSTATUS\tPRIVATE DNS NAME\tPRIVATE IP\tAZ\tDEVICE INDEX\tINSTANCE ID\tINSTANCE NAME"
 
 func PrintENI(w io.Writer, eni *model.ENI) {
 	enis := make([]*model.ENI, 1)
@@ -29,16 +29,16 @@ func PrintENIs(w io.Writer, enis []*model.ENI) {
 			instanceID, instanceName = instance.InstanceID(), instance.Name()
 		}
 
-		fmt.Fprintln(tw, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s",
+		fmt.Fprintln(tw, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s",
 			eni.InterfaceID(),
+			eni.Name(),
+			eni.Status(),
 			eni.PrivateDnsName(),
 			eni.PrivateIpAddress(),
+			eni.AvailabilityZone(),
+			eni.AttachedDeviceIndex(),
 			instanceID,
 			instanceName,
-			eni.AttachedDeviceIndex(),
-			eni.Status(),
-			eni.Name(),
-			eni.AvailabilityZone(),
 		))
 	}
 
