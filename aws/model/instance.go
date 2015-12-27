@@ -25,4 +25,3 @@ func (i *Instance) Name() string {
 	}
 	return ""
 }
-

@@ -5,7 +5,7 @@ import (
 )
 
 type ENI struct {
-	iface *ec2.NetworkInterface
+	iface    *ec2.NetworkInterface
 	instance *Instance
 }
 
@@ -68,7 +68,7 @@ func (e *ENI) AttachedStatus() string {
 
 func (e *ENI) AttachedInstanceID() string {
 	if e.iface.Attachment != nil && e.iface.Attachment.InstanceId != nil {
-		 return *e.iface.Attachment.InstanceId
+		return *e.iface.Attachment.InstanceId
 	}
 	return ""
 }
