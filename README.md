@@ -36,17 +36,18 @@ See also `granebi --help`.
 
 ```bash
 $ grabeni ls
-NetworkInterfaceID	PrivateDNSName				PrivateIPAddress	InstanceID	DeviceIndex	Status	Name
-eni-0000000	  ip-10-0-0-100.ap-northeast-1.compute.internal	10.0.0.100	   0		in-use
-eni-1111111		ip-10-0-0-10.ap-northeast-1.compute.internal	10.0.0.10			-1		available	eni01
-eni-2222222		ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11	     1		in-use	eni02
+ID            NAME	  STATUS		  PRIVATE DNS NAME				                      PRIVATE IP	AZ		  DEVICE INDEX	INSTANCE ID	INSTANCE NAME
+eni-00000000	eni01   in-use      ip-10-0-0-100.ap-northeast-1.compute.internal	10.0.0.100	ap-northeast-1b   0		i-00000000  instance01
+eni-11111111	eni02   available   ip-10-0-0-10.ap-northeast-1.compute.internal	10.0.0.10		ap-northeast-1c	 -1
+eni-22222222	eni03   avaolable   ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11	  ap-northeast-1c   1
 
 $ grabeni status eni-2222222
 NetworkInterfaceID	PrivateDNSName				PrivateIPAddress	InstanceID	DeviceIndex	Status	Name
-eni-2222222		ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11	     1		in-use	eni02
+ID            NAME	  STATUS		  PRIVATE DNS NAME				                      PRIVATE IP	AZ		  DEVICE INDEX	INSTANCE ID	INSTANCE NAME
+eni-22222222	eni03   avaolable   ip-10-0-0-11.ap-northeast-1.compute.internal	10.0.0.11	  ap-northeast-1c   1
 
 $ grabeni grab eni-2222222
-grabbed: eni eni-2222222 attached to instance i-xxxxxx
+eni eni-2222222 attached to instance i-xxxxxx
 ```
 
 ## Installation
@@ -78,7 +79,6 @@ $ ghr -u yuuki1 -p 2 $VERSION snapshot/
 
 - `attach`, `detach`, `grab`: Display prompt
 - `attach`, `detach`, `grab`: Show ENI information before execution
-- `attach`, `detach`, `grab`: Enrich log
 - `list`: Filter option
 - Add `check` command to check an availability zone
 - `attach`, `detach`, `grab`: dryrun option
