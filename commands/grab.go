@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/codegangsta/cli"
@@ -40,7 +41,18 @@ func doGrab(c *cli.Context) error {
 		}
 	}
 
-	eni, err := aws.NewENIClient().WithLogWriter(os.Stdout).GrabENI(&aws.GrabENIParam{
+	awscli := aws.NewENIClient().WithLogWriter(os.Stdout)
+
+	// Check instance id existence
+	instance, err := awscli.DescribeInstanceByID(instanceID)
+	if err != nil {
+		return err
+	}
+	if instance == nil {
+		return fmt.Errorf("No such instance %s", instanceID)
+	}
+
+	eni, err := awscli.GrabENI(&aws.GrabENIParam{
 		InterfaceID: eniID,
 		InstanceID:  instanceID,
 		DeviceIndex: c.Int("deviceindex"),
