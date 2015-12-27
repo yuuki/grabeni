@@ -124,6 +124,9 @@ func (c *ENIClient) DescribeENIs() ([]*model.ENI, error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(instances) < 1 {
+		return enis, nil
+	}
 	//TODO make hashmap
 
 	for _, eni := range enis {
@@ -312,11 +315,8 @@ func (c *ENIClient) DescribeInstancesByIDs(instanceIDs []string) ([]*model.Insta
 		return nil, err
 	}
 
-	if len(resp.Reservations) < 1 {
-		return nil, nil // Not found
-	}
+	instances := make([]*model.Instance, 0)
 
-	instances := make([]*model.Instance, 1)
 	for _, r := range resp.Reservations {
 		for _, i := range r.Instances {
 			instances = append(instances, model.NewInstance(i))
