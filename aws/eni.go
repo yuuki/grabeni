@@ -89,7 +89,13 @@ func (c *ENIClient) DescribeENIByID(InterfaceID string) (*model.ENI, error) {
 	}
 
 	eni := model.NewENI(resp.NetworkInterfaces[0])
-	instance, err := c.DescribeInstanceByID(eni.AttachedInstanceID())
+	instanceId := eni.AttachedInstanceID()
+
+	// eni is not attached
+	if instanceId == "" {
+		return eni, nil
+	}
+	instance, err := c.DescribeInstanceByID(instanceId)
 	if err != nil {
 		return nil, err
 	}
