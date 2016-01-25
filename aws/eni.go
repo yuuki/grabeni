@@ -286,7 +286,6 @@ func (c *ENIClient) GrabENI(p *GrabENIParam, wp *WaiterParam) (*model.ENI, error
 func (c *ENIClient) DescribeInstanceByID(instanceID string) (*model.Instance, error) {
 	p := &ec2.DescribeInstancesInput{
 		InstanceIds: []*string{aws.String(instanceID)},
-		MaxResults:  aws.Int64(1),
 	}
 	resp, err := c.svc.DescribeInstances(p)
 	if err != nil {
