@@ -68,14 +68,6 @@ $ brew install grabeni
  $ go install github.com/yuuki1/grabeni/...
 ```
 
-## Release
-
-```bash
-$ vim ./version.go
-$ make cross
-$ ghr -u yuuki1 -p 2 $VERSION snapshot/
-```
-
 ## Roadmap
 
 - `attach`, `detach`, `grab`: Display prompt
