@@ -19,3 +19,10 @@ func TestSetInstance(t *testing.T) {
 	assert.Equal(t, eni.instance, i)
 }
 
+func TestInterfaceID(t *testing.T) {
+	eni := NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+	})
+
+	assert.Equal(t, eni.InterfaceID(), "eni-2222222")
+}
