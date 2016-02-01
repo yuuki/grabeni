@@ -107,3 +107,31 @@ func TestAttachedDeviceIndex(t *testing.T) {
 
 	assert.Equal(t, eni.AttachedDeviceIndex(), int64(-1))
 }
+
+func TestAttachedStatus(t *testing.T) {
+	eni := NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Attachment: &ec2.NetworkInterfaceAttachment{
+			Status: aws.String("in-use"),
+		},
+	})
+
+	assert.Equal(t, eni.AttachedStatus(), "in-use")
+
+	eni = NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Attachment: nil,
+	})
+
+	assert.Equal(t, eni.AttachedStatus(), "")
+
+	eni = NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Attachment: &ec2.NetworkInterfaceAttachment{
+			Status: nil,
+		},
+	})
+
+	assert.Equal(t, eni.AttachedStatus(), "")
+}
+
