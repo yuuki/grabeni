@@ -81,3 +81,29 @@ func TestAttachmentID(t *testing.T) {
 	assert.Equal(t, eni.AttachmentID(), "")
 }
 
+func TestAttachedDeviceIndex(t *testing.T) {
+	eni := NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Attachment: &ec2.NetworkInterfaceAttachment{
+			DeviceIndex: aws.Int64(0),
+		},
+	})
+
+	assert.Equal(t, eni.AttachedDeviceIndex(), int64(0))
+
+	eni = NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Attachment: nil,
+	})
+
+	assert.Equal(t, eni.AttachedDeviceIndex(), int64(-1))
+
+	eni = NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Attachment: &ec2.NetworkInterfaceAttachment{
+			DeviceIndex: nil,
+		},
+	})
+
+	assert.Equal(t, eni.AttachedDeviceIndex(), int64(-1))
+}
