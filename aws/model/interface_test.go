@@ -53,3 +53,31 @@ func TestStatus(t *testing.T) {
 
 	assert.Equal(t, eni.Status(), "in-use")
 }
+
+func TestAttachmentID(t *testing.T) {
+	eni := NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Attachment: &ec2.NetworkInterfaceAttachment{
+			AttachmentId: aws.String("eni-attach-11111111"),
+		},
+	})
+
+	assert.Equal(t, eni.AttachmentID(), "eni-attach-11111111")
+
+	eni = NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Attachment: nil,
+	})
+
+	assert.Equal(t, eni.AttachmentID(), "")
+
+	eni = NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Attachment: &ec2.NetworkInterfaceAttachment{
+			AttachmentId: nil,
+		},
+	})
+
+	assert.Equal(t, eni.AttachmentID(), "")
+}
+
