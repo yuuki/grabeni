@@ -13,5 +13,16 @@ func TestInstanceID(t *testing.T) {
 		InstanceId: aws.String("i-1000000"),
 	})
 
-	assert.Equal(t, i.InstanceID(), "i-1000000", "InstanceID should be i-1000000")
+	assert.Equal(t, i.InstanceID(), "i-1000000")
+}
+
+func TestName(t *testing.T) {
+	i := NewInstance(&ec2.Instance{
+		Tags: []*ec2.Tag{&ec2.Tag{
+			Key: aws.String("Name"),
+			Value: aws.String("grabeni001"),
+		}},
+	})
+
+	assert.Equal(t, i.Name(), "grabeni001")
 }
