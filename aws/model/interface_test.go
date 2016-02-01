@@ -44,3 +44,12 @@ func TestPrivateIpAddress(t *testing.T) {
 
 	assert.Equal(t, eni.PrivateIpAddress(), "10.0.0.100")
 }
+
+func TestStatus(t *testing.T) {
+	eni := NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		Status: aws.String("in-use"),
+	})
+
+	assert.Equal(t, eni.Status(), "in-use")
+}
