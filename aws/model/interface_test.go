@@ -35,3 +35,12 @@ func TestPrivateDnsName(t *testing.T) {
 
 	assert.Equal(t, eni.PrivateDnsName(), "ip-10-0-0-100.ap-northeast-1.compute.internal")
 }
+
+func TestPrivateIpAddress(t *testing.T) {
+	eni := NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		PrivateIpAddress: aws.String("10.0.0.100"),
+	})
+
+	assert.Equal(t, eni.PrivateIpAddress(), "10.0.0.100")
+}
