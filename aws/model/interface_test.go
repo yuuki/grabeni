@@ -172,3 +172,12 @@ func TestAttachedInstance(t *testing.T) {
 
 	assert.Equal(t, *eni.AttachedInstance().InstanceId, "i-1000000")
 }
+
+func TestAvailabilityZone(t *testing.T) {
+	eni := NewENI(&ec2.NetworkInterface{
+		NetworkInterfaceId: aws.String("eni-2222222"),
+		AvailabilityZone: aws.String("ap-northeast-1a"),
+	})
+
+	assert.Equal(t, eni.AvailabilityZone(), "ap-northeast-1a")
+}
