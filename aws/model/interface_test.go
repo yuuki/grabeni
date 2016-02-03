@@ -181,3 +181,14 @@ func TestAvailabilityZone(t *testing.T) {
 
 	assert.Equal(t, eni.AvailabilityZone(), "ap-northeast-1a")
 }
+
+func TestInterfaceName(t *testing.T) {
+	eni := NewENI(&ec2.NetworkInterface{
+		TagSet: []*ec2.Tag{&ec2.Tag{
+			Key: aws.String("Name"),
+			Value: aws.String("eni001"),
+		}},
+	})
+
+	assert.Equal(t, eni.Name(), "eni001")
+}
