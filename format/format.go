@@ -23,6 +23,10 @@ func PrintENIs(w io.Writer, enis []*model.ENI) {
 	fmt.Fprintln(tw, header)
 
 	for _, eni := range enis {
+		if eni == nil {
+			continue
+		}
+
 		instance := eni.AttachedInstance()
 		var instanceID, instanceName string
 		if instance != nil {
