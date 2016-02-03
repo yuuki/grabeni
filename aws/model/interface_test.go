@@ -161,3 +161,14 @@ func TestAttachedInstanceID(t *testing.T) {
 
 	assert.Equal(t, eni.AttachedInstanceID(), "")
 }
+
+func TestAttachedInstance(t *testing.T) {
+	i := NewInstance(&ec2.Instance{
+		InstanceId: aws.String("i-1000000"),
+	})
+	eni := NewENI(&ec2.NetworkInterface{})
+
+	eni.SetInstance(i)
+
+	assert.Equal(t, *eni.AttachedInstance().InstanceId, "i-1000000")
+}
