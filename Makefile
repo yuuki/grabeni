@@ -2,10 +2,14 @@ BIN = grabeni
 
 all: clean build test
 
-test: testdeps
+test: testdeps gen
 	go test -v ./...
 
-build: deps
+gen:
+	go get github.com/vektra/mockery/.../
+	mockery -all -dir ${GOPATH}/src/github.com/aws/aws-sdk-go/service/ec2/ec2iface -print | perl -pe 's/^package mocks/package aws/' > aws/mock_ec2api.go
+
+build: deps gen
 	go build -o $(BIN) ./cmd
 
 lint: deps testdeps
