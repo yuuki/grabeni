@@ -22,6 +22,41 @@ func newClient(svc *EC2API) *ENIClient{
 	}
 }
 
+func TestDescribeENIByID(t *testing.T) {
+	mockEC2 := new(EC2API)
+	c := newClient(mockEC2)
+
+	mockEC2.On("DescribeNetworkInterfaces", &ec2.DescribeNetworkInterfacesInput{
+		NetworkInterfaceIds: []*string{aws.String("eni-00000001")},
+	}).Return(&ec2.DescribeNetworkInterfacesOutput{
+		NetworkInterfaces: []*ec2.NetworkInterface{
+			&ec2.NetworkInterface{
+				NetworkInterfaceId: aws.String("eni-00000001"),
+				Attachment: &ec2.NetworkInterfaceAttachment{
+					InstanceId: aws.String("i-00000001"),
+				},
+			},
+		},
+	}, nil)
+
+	mockEC2.On("DescribeInstances", &ec2.DescribeInstancesInput{
+		InstanceIds: []*string{aws.String("i-00000001")},
+	}).Return(&ec2.DescribeInstancesOutput{
+		Reservations: []*ec2.Reservation{
+			&ec2.Reservation{
+				Instances: []*ec2.Instance{&ec2.Instance{
+					InstanceId: aws.String("i-00000001"),
+				}},
+			},
+		},
+	}, nil)
+
+	eni, err := c.DescribeENIByID("eni-00000001")
+
+	assert.NoError(t, err)
+	assert.Equal(t, "i-00000001", eni.AttachedInstanceID())
+}
+
 func TestDescribeInstanceByID(t *testing.T) {
 	mockEC2 := new(EC2API)
 	c := newClient(mockEC2)
@@ -56,6 +91,7 @@ func TestDescribeInstancesByID(t *testing.T) {
 				Instances: []*ec2.Instance{&ec2.Instance{
 					InstanceId: aws.String("i-00000001"),
 				}},
+
 			},
 		},
 	}, nil)
