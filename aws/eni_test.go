@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 // Return client for test
@@ -91,6 +92,48 @@ func TestDescribeENIByID(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Nil(t, eni.AttachedInstance())
 	}
+}
+
+func TestDescribeENIs(t *testing.T) {
+	mockEC2 := new(EC2API)
+	c := newClient(mockEC2)
+
+	mockEC2.On("DescribeNetworkInterfaces", mock.Anything).Return(
+		&ec2.DescribeNetworkInterfacesOutput{
+			NetworkInterfaces: []*ec2.NetworkInterface{
+				&ec2.NetworkInterface{
+					NetworkInterfaceId: aws.String("eni-00000001"),
+					Attachment: &ec2.NetworkInterfaceAttachment{
+						InstanceId: aws.String("i-00000001"),
+					},
+				},
+				&ec2.NetworkInterface{
+					NetworkInterfaceId: aws.String("eni-00000002"),
+					Attachment: nil,
+				},
+			},
+	}, nil)
+
+	mockEC2.On("DescribeInstances", &ec2.DescribeInstancesInput{
+		InstanceIds: []*string{aws.String("i-00000001")},
+	}).Return(&ec2.DescribeInstancesOutput{
+		Reservations: []*ec2.Reservation{
+			&ec2.Reservation{
+				Instances: []*ec2.Instance{&ec2.Instance{
+					InstanceId: aws.String("i-00000001"),
+				}},
+			},
+		},
+	}, nil)
+
+	enis, err := c.DescribeENIs()
+
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(enis))
+	if assert.NotNil(t, enis[0].AttachedInstance()) {
+		assert.Equal(t, "i-00000001", enis[0].AttachedInstanceID())
+	}
+	assert.Nil(t, enis[1].AttachedInstance())
 }
 
 func TestDescribeInstanceByID(t *testing.T) {
