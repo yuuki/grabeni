@@ -133,13 +133,20 @@ func (c *ENIClient) DescribeENIs() ([]*model.ENI, error) {
 	if len(instances) < 1 {
 		return enis, nil
 	}
-	//TODO make hashmap
+
+	// Make hashmap to avoid O(N*M) loop
+	instanceByInstanceID := make(map[string]*model.Instance)
+	for _, i := range instances {
+		instanceByInstanceID[i.InstanceID()] = i
+	}
 
 	for _, eni := range enis {
-		for _, instance := range instances {
-			if eni.AttachedInstanceID() == instance.InstanceID() {
-				eni.SetInstance(instance)
-			}
+		id := eni.AttachedInstanceID()
+		if id == "" {
+			continue
+		}
+		if i := instanceByInstanceID[id]; i != nil {
+			eni.SetInstance(i)
 		}
 	}
 
