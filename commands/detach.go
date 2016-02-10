@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/Songmu/prompter"
 
 	"github.com/yuuki1/grabeni/aws"
 	"github.com/yuuki1/grabeni/log"
@@ -28,6 +29,11 @@ func doDetach(c *cli.Context) error {
 	}
 
 	eniID := c.Args().Get(0)
+
+	if !prompter.YN("Detach following ENI.\n  "+eniID+"\nAre you sure?", true) {
+		log.Infof("detachment is canceled")
+		return nil
+	}
 
 	eni, err := aws.NewENIClient().WithLogWriter(os.Stdout).DetachENIWithWaiter(&aws.DetachENIParam{
 		InterfaceID: eniID,

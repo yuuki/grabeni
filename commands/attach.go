@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/Songmu/prompter"
 
 	"github.com/yuuki1/grabeni/aws"
 	"github.com/yuuki1/grabeni/log"
@@ -31,6 +32,11 @@ func doAttach(c *cli.Context) error {
 	}
 
 	eniID := c.Args().Get(0)
+
+	if !prompter.YN("Attach following ENI.\n  "+eniID+"\nAre you sure?", true) {
+		log.Infof("Attachment is canceled")
+		return nil
+	}
 
 	var instanceID string
 	if instanceID = c.String("instanceid"); instanceID == "" {
