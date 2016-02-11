@@ -39,8 +39,8 @@ func TestPrintENIs(t *testing.T) {
 
 	i := model.NewInstance(&ec2.Instance{
 		InstanceId: aws.String("i-1000000"),
-		Tags: []*ec2.Tag{&ec2.Tag{
-			Key: aws.String("Name"),
+		Tags: []*ec2.Tag{{
+			Key:   aws.String("Name"),
 			Value: aws.String("grabeni001"),
 		}},
 	})

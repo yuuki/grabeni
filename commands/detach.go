@@ -4,8 +4,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/codegangsta/cli"
 	"github.com/Songmu/prompter"
+	"github.com/codegangsta/cli"
 
 	"github.com/yuuki1/grabeni/aws"
 	"github.com/yuuki1/grabeni/log"

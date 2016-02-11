@@ -13,12 +13,12 @@ import (
 )
 
 // Return client for test
-func newClient(svc *EC2API) *ENIClient{
+func newClient(svc *EC2API) *ENIClient {
 	f, _ := os.Open(os.DevNull)
 	l := log.New(f, "", 0)
 	return &ENIClient{
-		svc: svc,
-		logger: l,
+		svc:       svc,
+		logger:    l,
 		logWriter: new(bytes.Buffer),
 	}
 }
@@ -32,7 +32,7 @@ func TestDescribeENIByID(t *testing.T) {
 			NetworkInterfaceIds: []*string{aws.String("eni-00000001")},
 		}).Return(&ec2.DescribeNetworkInterfacesOutput{
 			NetworkInterfaces: []*ec2.NetworkInterface{
-				&ec2.NetworkInterface{
+				{
 					NetworkInterfaceId: aws.String("eni-00000001"),
 					Attachment: &ec2.NetworkInterfaceAttachment{
 						InstanceId: aws.String("i-00000001"),
@@ -45,8 +45,8 @@ func TestDescribeENIByID(t *testing.T) {
 			InstanceIds: []*string{aws.String("i-00000001")},
 		}).Return(&ec2.DescribeInstancesOutput{
 			Reservations: []*ec2.Reservation{
-				&ec2.Reservation{
-					Instances: []*ec2.Instance{&ec2.Instance{
+				{
+					Instances: []*ec2.Instance{{
 						InstanceId: aws.String("i-00000001"),
 					}},
 				},
@@ -68,7 +68,7 @@ func TestDescribeENIByID(t *testing.T) {
 			NetworkInterfaceIds: []*string{aws.String("eni-00000001")},
 		}).Return(&ec2.DescribeNetworkInterfacesOutput{
 			NetworkInterfaces: []*ec2.NetworkInterface{
-				&ec2.NetworkInterface{
+				{
 					NetworkInterfaceId: aws.String("eni-00000001"),
 					// Not attached
 				},
@@ -79,8 +79,8 @@ func TestDescribeENIByID(t *testing.T) {
 			InstanceIds: []*string{aws.String("i-00000001")},
 		}).Return(&ec2.DescribeInstancesOutput{
 			Reservations: []*ec2.Reservation{
-				&ec2.Reservation{
-					Instances: []*ec2.Instance{&ec2.Instance{
+				{
+					Instances: []*ec2.Instance{{
 						InstanceId: aws.String("i-00000001"),
 					}},
 				},
@@ -101,25 +101,25 @@ func TestDescribeENIs(t *testing.T) {
 	mockEC2.On("DescribeNetworkInterfaces", mock.Anything).Return(
 		&ec2.DescribeNetworkInterfacesOutput{
 			NetworkInterfaces: []*ec2.NetworkInterface{
-				&ec2.NetworkInterface{
+				{
 					NetworkInterfaceId: aws.String("eni-00000001"),
 					Attachment: &ec2.NetworkInterfaceAttachment{
 						InstanceId: aws.String("i-00000001"),
 					},
 				},
-				&ec2.NetworkInterface{
+				{
 					NetworkInterfaceId: aws.String("eni-00000002"),
-					Attachment: nil,
+					Attachment:         nil,
 				},
 			},
-	}, nil)
+		}, nil)
 
 	mockEC2.On("DescribeInstances", &ec2.DescribeInstancesInput{
 		InstanceIds: []*string{aws.String("i-00000001")},
 	}).Return(&ec2.DescribeInstancesOutput{
 		Reservations: []*ec2.Reservation{
-			&ec2.Reservation{
-				Instances: []*ec2.Instance{&ec2.Instance{
+			{
+				Instances: []*ec2.Instance{{
 					InstanceId: aws.String("i-00000001"),
 				}},
 			},
@@ -144,8 +144,8 @@ func TestDescribeInstanceByID(t *testing.T) {
 		InstanceIds: []*string{aws.String("i-00000001")},
 	}).Return(&ec2.DescribeInstancesOutput{
 		Reservations: []*ec2.Reservation{
-			&ec2.Reservation{
-				Instances: []*ec2.Instance{&ec2.Instance{
+			{
+				Instances: []*ec2.Instance{{
 					InstanceId: aws.String("i-00000001"),
 				}},
 			},
@@ -166,11 +166,10 @@ func TestDescribeInstancesByID(t *testing.T) {
 		InstanceIds: []*string{aws.String("i-00000001")},
 	}).Return(&ec2.DescribeInstancesOutput{
 		Reservations: []*ec2.Reservation{
-			&ec2.Reservation{
-				Instances: []*ec2.Instance{&ec2.Instance{
+			{
+				Instances: []*ec2.Instance{{
 					InstanceId: aws.String("i-00000001"),
 				}},
-
 			},
 		},
 	}, nil)
@@ -181,7 +180,6 @@ func TestDescribeInstancesByID(t *testing.T) {
 	assert.Equal(t, 1, len(instances))
 	assert.Equal(t, "i-00000001", instances[0].InstanceID())
 
-
 	mockEC2 = new(EC2API)
 	c = newClient(mockEC2)
 
@@ -189,7 +187,7 @@ func TestDescribeInstancesByID(t *testing.T) {
 		InstanceIds: []*string{aws.String("i-00000000")},
 	}).Return(&ec2.DescribeInstancesOutput{
 		Reservations: []*ec2.Reservation{
-			&ec2.Reservation{Instances: nil},
+			{Instances: nil},
 		},
 	}, nil)
 
@@ -198,4 +196,3 @@ func TestDescribeInstancesByID(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(instances))
 }
-

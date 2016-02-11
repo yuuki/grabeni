@@ -30,7 +30,7 @@ func TestInterfaceID(t *testing.T) {
 func TestPrivateDnsName(t *testing.T) {
 	eni := NewENI(&ec2.NetworkInterface{
 		NetworkInterfaceId: aws.String("eni-2222222"),
-		PrivateDnsName: aws.String("ip-10-0-0-100.ap-northeast-1.compute.internal"),
+		PrivateDnsName:     aws.String("ip-10-0-0-100.ap-northeast-1.compute.internal"),
 	})
 
 	assert.Equal(t, eni.PrivateDnsName(), "ip-10-0-0-100.ap-northeast-1.compute.internal")
@@ -39,7 +39,7 @@ func TestPrivateDnsName(t *testing.T) {
 func TestPrivateIpAddress(t *testing.T) {
 	eni := NewENI(&ec2.NetworkInterface{
 		NetworkInterfaceId: aws.String("eni-2222222"),
-		PrivateIpAddress: aws.String("10.0.0.100"),
+		PrivateIpAddress:   aws.String("10.0.0.100"),
 	})
 
 	assert.Equal(t, eni.PrivateIpAddress(), "10.0.0.100")
@@ -48,7 +48,7 @@ func TestPrivateIpAddress(t *testing.T) {
 func TestStatus(t *testing.T) {
 	eni := NewENI(&ec2.NetworkInterface{
 		NetworkInterfaceId: aws.String("eni-2222222"),
-		Status: aws.String("in-use"),
+		Status:             aws.String("in-use"),
 	})
 
 	assert.Equal(t, eni.Status(), "in-use")
@@ -66,7 +66,7 @@ func TestAttachmentID(t *testing.T) {
 
 	eni = NewENI(&ec2.NetworkInterface{
 		NetworkInterfaceId: aws.String("eni-2222222"),
-		Attachment: nil,
+		Attachment:         nil,
 	})
 
 	assert.Equal(t, eni.AttachmentID(), "")
@@ -93,7 +93,7 @@ func TestAttachedDeviceIndex(t *testing.T) {
 
 	eni = NewENI(&ec2.NetworkInterface{
 		NetworkInterfaceId: aws.String("eni-2222222"),
-		Attachment: nil,
+		Attachment:         nil,
 	})
 
 	assert.Equal(t, eni.AttachedDeviceIndex(), int64(-1))
@@ -120,7 +120,7 @@ func TestAttachedStatus(t *testing.T) {
 
 	eni = NewENI(&ec2.NetworkInterface{
 		NetworkInterfaceId: aws.String("eni-2222222"),
-		Attachment: nil,
+		Attachment:         nil,
 	})
 
 	assert.Equal(t, eni.AttachedStatus(), "")
@@ -147,7 +147,7 @@ func TestAttachedInstanceID(t *testing.T) {
 
 	eni = NewENI(&ec2.NetworkInterface{
 		NetworkInterfaceId: aws.String("eni-2222222"),
-		Attachment: nil,
+		Attachment:         nil,
 	})
 
 	assert.Equal(t, eni.AttachedInstanceID(), "")
@@ -176,7 +176,7 @@ func TestAttachedInstance(t *testing.T) {
 func TestAvailabilityZone(t *testing.T) {
 	eni := NewENI(&ec2.NetworkInterface{
 		NetworkInterfaceId: aws.String("eni-2222222"),
-		AvailabilityZone: aws.String("ap-northeast-1a"),
+		AvailabilityZone:   aws.String("ap-northeast-1a"),
 	})
 
 	assert.Equal(t, eni.AvailabilityZone(), "ap-northeast-1a")
@@ -184,8 +184,8 @@ func TestAvailabilityZone(t *testing.T) {
 
 func TestInterfaceName(t *testing.T) {
 	eni := NewENI(&ec2.NetworkInterface{
-		TagSet: []*ec2.Tag{&ec2.Tag{
-			Key: aws.String("Name"),
+		TagSet: []*ec2.Tag{{
+			Key:   aws.String("Name"),
 			Value: aws.String("eni001"),
 		}},
 	})

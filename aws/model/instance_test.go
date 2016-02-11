@@ -18,8 +18,8 @@ func TestInstanceID(t *testing.T) {
 
 func TestName(t *testing.T) {
 	i := NewInstance(&ec2.Instance{
-		Tags: []*ec2.Tag{&ec2.Tag{
-			Key: aws.String("Name"),
+		Tags: []*ec2.Tag{{
+			Key:   aws.String("Name"),
 			Value: aws.String("grabeni001"),
 		}},
 	})
