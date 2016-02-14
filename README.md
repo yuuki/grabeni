@@ -3,10 +3,12 @@ grabeni
 [![Latest Version](http://img.shields.io/github/release/yuuki1/grabeni.svg?style=flat-square)][release]
 [![Build Status](http://img.shields.io/travis/yuuki1/grabeni.svg?style=flat-square)][travis]
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
+[![Go Report Card](https://goreportcard.com/badge/github.com/yuuki1/grabeni)][goreport]
 
 [release]: https://github.com/yuuki1/grabeni/releases
 [travis]: http://travis-ci.org/yuuki1/grabeni
 [godocs]: http://godoc.org/github.com/yuuki1/grabeni
+[goreport]: https://goreportcard.com/report/github.com/yuuki1/grabeni
 
 `grabeni` is an operation-friendly tool to grab an EC2 Network Interface (ENI) from an other EC2 instance.
 
