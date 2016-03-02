@@ -74,7 +74,6 @@ $ brew install grabeni
 
 ## Roadmap
 
-- `attach`, `detach`, `grab`: Display prompt
 - `attach`, `detach`, `grab`: Show ENI information before execution
 - `list`: Filter option
 - Add `check` command to check an availability zone
