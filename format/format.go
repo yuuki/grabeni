@@ -5,7 +5,7 @@ import (
 	"io"
 	"text/tabwriter"
 
-	"github.com/yuuki1/grabeni/aws/model"
+	"github.com/yuuki/grabeni/aws/model"
 )
 
 const header = "ID\tNAME\tSTATUS\tPRIVATE DNS NAME\tPRIVATE IP\tAZ\tDEVICE INDEX\tINSTANCE ID\tINSTANCE NAME"

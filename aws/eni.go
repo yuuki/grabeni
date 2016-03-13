@@ -12,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 
-	"github.com/yuuki1/grabeni/aws/model"
+	"github.com/yuuki/grabeni/aws/model"
 )
 
 type ENIClient struct {

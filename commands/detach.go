@@ -7,8 +7,8 @@ import (
 	"github.com/Songmu/prompter"
 	"github.com/codegangsta/cli"
 
-	"github.com/yuuki1/grabeni/aws"
-	"github.com/yuuki1/grabeni/log"
+	"github.com/yuuki/grabeni/aws"
+	"github.com/yuuki/grabeni/log"
 )
 
 var CommandArgDetach = "[--max-attempts MAX_ATTEMPTS] [--interval INTERVAL] ENI_ID"

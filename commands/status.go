@@ -6,8 +6,8 @@ import (
 
 	"github.com/codegangsta/cli"
 
-	"github.com/yuuki1/grabeni/aws"
-	"github.com/yuuki1/grabeni/format"
+	"github.com/yuuki/grabeni/aws"
+	"github.com/yuuki/grabeni/format"
 )
 
 var CommandArgStatus = "ENI_ID"

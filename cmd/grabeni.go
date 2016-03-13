@@ -8,8 +8,8 @@ import (
 
 	"github.com/codegangsta/cli"
 
-	"github.com/yuuki1/grabeni/commands"
-	"github.com/yuuki1/grabeni/log"
+	"github.com/yuuki/grabeni/commands"
+	"github.com/yuuki/grabeni/log"
 )
 
 var AppHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
@@ -84,7 +84,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = path.Base(os.Args[0])
 	app.Author = "y_uuki"
-	app.Email = "https://github.com/yuuki1/grabeni"
+	app.Email = "https://github.com/yuuki/grabeni"
 	app.Commands = commands.Commands
 	app.CommandNotFound = cmdNotFound
 	app.Usage = "An ops-friendly AWS ENI grabbing tool"

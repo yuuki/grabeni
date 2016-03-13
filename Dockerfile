@@ -7,6 +7,6 @@ RUN go get  github.com/golang/lint/golint \
             github.com/laher/goxc
 
 ENV USER root
-WORKDIR /go/src/github.com/yuuki1/grabeni
+WORKDIR /go/src/github.com/yuuki/grabeni
 
-ADD . /go/src/github.com/yuuki1/grabeni
+ADD . /go/src/github.com/yuuki/grabeni

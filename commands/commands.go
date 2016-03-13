@@ -5,7 +5,7 @@ import (
 
 	"github.com/codegangsta/cli"
 
-	"github.com/yuuki1/grabeni/log"
+	"github.com/yuuki/grabeni/log"
 )
 
 var Commands = []cli.Command{

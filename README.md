@@ -1,15 +1,15 @@
 grabeni
 =======
-[![Latest Version](http://img.shields.io/github/release/yuuki1/grabeni.svg?style=flat-square)][release]
-[![Build Status](http://img.shields.io/travis/yuuki1/grabeni.svg?style=flat-square)][travis]
+[![Latest Version](http://img.shields.io/github/release/yuuki/grabeni.svg?style=flat-square)][release]
+[![Build Status](http://img.shields.io/travis/yuuki/grabeni.svg?style=flat-square)][travis]
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
-[![Go Report Card](https://goreportcard.com/badge/github.com/yuuki1/grabeni)][goreport]
+[![Go Report Card](https://goreportcard.com/badge/github.com/yuuki/grabeni)][goreport]
 [![License](http://img.shields.io/:license-mit-blue.svg)][license]
 
-[release]: https://github.com/yuuki1/grabeni/releases
-[travis]: http://travis-ci.org/yuuki1/grabeni
-[godocs]: http://godoc.org/github.com/yuuki1/grabeni
-[goreport]: https://goreportcard.com/report/github.com/yuuki1/grabeni
+[release]: https://github.com/yuuki/grabeni/releases
+[travis]: http://travis-ci.org/yuuki/grabeni
+[godocs]: http://godoc.org/github.com/yuuki/grabeni
+[goreport]: https://goreportcard.com/report/github.com/yuuki/grabeni
 [license]: http://doge.mit-license.org
 
 `grabeni` is an operation-friendly tool to grab an EC2 Network Interface (ENI) from an other EC2 instance.
@@ -59,17 +59,17 @@ eni eni-2222222 attached to instance i-xxxxxx
 
 ### Homebrew
 ```bash
-$ brew tap yuuki1/grabeni
+$ brew tap yuuki/grabeni
 $ brew install grabeni
 ```
 
 ### Download binary from GitHub Releases
-[Releases・yuuki1/grabeni - GitHub](https://github.com/yuuki1/grabeni/releases)
+[Releases・yuuki/grabeni - GitHub](https://github.com/yuuki/grabeni/releases)
 
 ### Build from source
 ```bash
- $ go get github.com/yuuki1/grabeni
- $ go install github.com/yuuki1/grabeni/...
+ $ go get github.com/yuuki/grabeni
+ $ go install github.com/yuuki/grabeni/...
 ```
 
 ## Roadmap
@@ -95,4 +95,4 @@ $ brew install grabeni
 
 ## Author
 
-[y_uuki](https://github.com/yuuki1)
+[y_uuki](https://github.com/yuuki)
