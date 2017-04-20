@@ -1,9 +1,10 @@
 BIN = grabeni
+PKGS = $$(go list ./... | grep -v vendor)
 
 all: clean build test
 
-test: testdeps gen
-	go test -v ./...
+test: gen
+	go test -v $(PKGS)
 
 gen:
 	go get github.com/vektra/mockery/.../
