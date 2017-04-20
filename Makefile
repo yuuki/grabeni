@@ -10,7 +10,7 @@ gen:
 	mockery -all -dir vendor/github.com/aws/aws-sdk-go/service/ec2/ec2iface -print | perl -pe 's/^package mocks/package aws/' > aws/mock_ec2api.go
 
 build: gen
-	go build -o $(BIN) ./cmd
+	go build -o $(BIN) ./cmd/...
 
 lint:
 	go vet
