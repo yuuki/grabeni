@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 
 	"github.com/yuuki/grabeni/aws"
 	"github.com/yuuki/grabeni/format"

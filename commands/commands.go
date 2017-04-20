@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 
 	"github.com/yuuki/grabeni/log"
 )
