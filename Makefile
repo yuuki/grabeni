@@ -7,12 +7,12 @@ test: testdeps gen
 
 gen:
 	go get github.com/vektra/mockery/.../
-	mockery -all -dir ${GOPATH}/src/github.com/aws/aws-sdk-go/service/ec2/ec2iface -print | perl -pe 's/^package mocks/package aws/' > aws/mock_ec2api.go
+	mockery -all -dir vendor/github.com/aws/aws-sdk-go/service/ec2/ec2iface -print | perl -pe 's/^package mocks/package aws/' > aws/mock_ec2api.go
 
-build: deps gen
+build: gen
 	go build -o $(BIN) ./cmd
 
-lint: deps testdeps
+lint:
 	go vet
 	golint
 
@@ -24,12 +24,6 @@ minor: gobump
 
 gobump:
 	go get github.com/motemen/gobump/cmd/gobump
-
-deps:
-	go get -d -v ./...
-
-testdeps:
-	go get -d -v -t ./...
 
 clean:
 	go clean
