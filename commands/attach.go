@@ -22,6 +22,7 @@ var CommandAttach = cli.Command{
 		cli.StringFlag{Name: "I, instanceid", Usage: "attach-targeted instance id"},
 		cli.IntFlag{Name: "n, max-attempts", Value: 10, Usage: "the maximum number of attempts to poll the change of ENI status (default: 10)"},
 		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "the interval in seconds to poll the change of ENI status (default: 2)"},
+		cli.BoolFlag{Name: "f, force", Usage: "run without y/n acknowledgement (default: false)"},
 	},
 }
 
@@ -33,9 +34,11 @@ func doAttach(c *cli.Context) error {
 
 	eniID := c.Args().Get(0)
 
-	if !prompter.YN("Attach following ENI.\n  "+eniID+"\nAre you sure?", true) {
-		log.Infof("Attachment is canceled")
-		return nil
+	if !c.Bool("force") {
+		if !prompter.YN("Attach following ENI.\n  "+eniID+"\nAre you sure?", true) {
+			log.Infof("Attachment is canceled")
+			return nil
+		}
 	}
 
 	var instanceID string

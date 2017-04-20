@@ -19,6 +19,7 @@ var CommandDetach = cli.Command{
 	Flags: []cli.Flag{
 		cli.IntFlag{Name: "n, max-attempts", Value: 10, Usage: "the maximum number of attempts to poll the change of ENI status (default: 10)"},
 		cli.IntFlag{Name: "i, interval", Value: 2, Usage: "the interval in seconds to poll the change of ENI status (default: 2)"},
+		cli.BoolFlag{Name: "f, force", Usage: "run without y/n acknowledgement (default: false)"},
 	},
 }
 
@@ -30,9 +31,11 @@ func doDetach(c *cli.Context) error {
 
 	eniID := c.Args().Get(0)
 
-	if !prompter.YN("Detach following ENI.\n  "+eniID+"\nAre you sure?", true) {
-		log.Infof("detachment is canceled")
-		return nil
+	if !c.Bool("force") {
+		if !prompter.YN("Detach following ENI.\n  "+eniID+"\nAre you sure?", true) {
+			log.Infof("detachment is canceled")
+			return nil
+		}
 	}
 
 	eni, err := aws.NewENIClient().WithLogWriter(os.Stdout).DetachENIWithWaiter(&aws.DetachENIParam{
