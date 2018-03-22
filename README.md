@@ -25,6 +25,14 @@ The list of `grabeni`'s features below.
 - Grabbing (Attaching and Detaching) the specified ENI to the specified instance.
 - timeout/retry for requesting AWS API.
 
+## Requirements
+```
+ec2:DescribeInstances
+ec2:DescribeNetworkInterfaces
+ec2:AttachNetworkInterface
+ec2:DetachNetworkInterface
+```
+
 ## Usage
 
 ```bash
@@ -34,7 +42,7 @@ $ export AWS_REGION='us-east-1'
 $ grabeni grab eni-xxxxxx --instanceid i-xxxxxxd # attach eni-xxxxxx to EC2 instance where grabeni runs if instanceid option is skipped
 ```
 
-See also `granebi --help`.
+See also `grabeni --help`.
 
 ## Example
 
