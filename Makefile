@@ -24,7 +24,7 @@ minor: gobump
 	./script/release.sh minor
 
 gobump:
-	go get github.com/motemen/gobump/cmd/gobump
+	go get github.com/x-motemen/gobump/cmd/gobump
 
 clean:
 	go clean
