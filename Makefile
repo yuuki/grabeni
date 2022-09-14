@@ -17,14 +17,11 @@ lint:
 	go vet
 	golint
 
-patch: gobump
+patch:
 	./script/release.sh patch
 
-minor: gobump
+minor:
 	./script/release.sh minor
-
-gobump:
-	go get github.com/x-motemen/gobump/cmd/gobump
 
 clean:
 	go clean
