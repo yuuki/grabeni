@@ -7,8 +7,8 @@ test: gen
 	go test -v $(PKGS)
 
 gen:
-	go get github.com/vektra/mockery/.../
-	mockery -all -dir vendor/github.com/aws/aws-sdk-go/service/ec2/ec2iface -print | perl -pe 's/^package mocks/package aws/' > aws/mock_ec2api.go
+	go install github.com/vektra/mockery/v2@latest
+	mockery --all --dir vendor/github.com/aws/aws-sdk-go/service/ec2/ec2iface --print | perl -pe 's/^package mocks/package aws/' > aws/mock_ec2api.go
 
 build: gen
 	go build -o $(BIN) ./cmd/...
