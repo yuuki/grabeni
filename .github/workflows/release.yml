@@ -1,0 +1,66 @@
+name: release
+on:
+  push:
+    tags:
+    - "v[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  DOCKER_BASE_NAME: ghcr.io/${{ github.repository }}
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Setup Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.19
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v1
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  docker:
+    name: Push Docker image to GitHub Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Set variables
+        if: github.event_name != 'pull_request'
+        id: variables
+        run: |
+          git_tag_name="${GITHUB_REF#refs/tags/}"
+          echo "::set-output name=git_tag_name::${git_tag_name}"
+          git_tag_name="${git_tag_name#v}"
+          echo "::set-output name=release_tag_patch::${git_tag_name}"
+          echo "::set-output name=release_tag_minor::${git_tag_name%.*}"
+          echo "::set-output name=release_tag_major::${git_tag_name%%.*}"
+          echo "::set-output name=created::$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+      - name: Login
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push to GitHub Packages
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ steps.variables.outputs.release_tag_patch }}
+            ghcr.io/${{ github.repository }}:${{ steps.variables.outputs.release_tag_minor }}
+            ghcr.io/${{ github.repository }}:${{ steps.variables.outputs.release_tag_major }}
